@@ -1,153 +1,200 @@
-﻿import React, { useState, useEffect } from "react";
-import { QUIZ_QUESTIONS } from "../data/questions";
+﻿import { useState, useEffect } from "react";
+import { questions } from "../data/questions";
 
-interface HostDashboardProps {
-  onBack: () => void;
+interface ScoreData {
+  [playerName: string]: number;
 }
 
-export const HostDashboard: React.FC<HostDashboardProps> = ({ onBack }) => {
-  const [roomCode, setRoomCode] = useState<string>("A1B2");
-  const [players, setPlayers] = useState<string[]>([]);
-  const [activeTab, setActiveTab] = useState<"game" | "ranking" | "members">("game");
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(() => {
-    return parseInt(localStorage.getItem(`quiz_qindex_${roomCode}`) || "0", 10);
-  });
-  const [showAnswer, setShowAnswer] = useState<boolean>(false);
-  const [gameStarted, setGameStarted] = useState<boolean>(false);
+export default function HostDashboard() {
+  const [currentQ, setCurrentQ] = useState(0);
+  const [showAnswer, setShowAnswer] = useState(false);
+  const [timer, setTimer] = useState(15);
+  const [timerActive, setTimerActive] = useState(false);
+  const [scores, setScores] = useState<ScoreData>({});
+  const [gameFinished, setGameFinished] = useState(false);
 
   useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem(`quiz_players_${roomCode}`) || "[]");
-    setPlayers(stored);
-  }, [roomCode]);
+    localStorage.setItem("quiz_qindex", currentQ.toString());
+    localStorage.setItem("quiz_showanswer", showAnswer ? "true" : "false");
+    localStorage.setItem("quiz_finished", gameFinished ? "true" : "false");
+  }, [currentQ, showAnswer, gameFinished]);
 
-  const updateQuestionIndex = (newIndex: number) => {
-    setCurrentQuestionIndex(newIndex);
-    localStorage.setItem(`quiz_qindex_${roomCode}`, newIndex.toString());
+  useEffect(() => {
+    let interval: any;
+    if (timerActive && timer > 0) {
+      interval = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+    } else if (timer === 0) {
+      setTimerActive(false);
+    }
+    return () => clearInterval(interval);
+  }, [timerActive, timer]);
+
+  useEffect(() => {
+    const handleStorage = () => {
+      const savedScores = localStorage.getItem("quiz_scores");
+      if (savedScores) setScores(JSON.parse(savedScores));
+    };
+    handleStorage();
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, []);
+
+  const handleNext = () => {
+    if (currentQ < questions.length - 1) {
+      setCurrentQ(currentQ + 1);
+      setShowAnswer(false);
+      setTimer(15);
+      setTimerActive(false);
+    } else {
+      setGameFinished(true);
+    }
+  };
+
+  const handleReveal = () => {
+    setShowAnswer(true);
+    setTimerActive(false);
+  };
+
+  const handleStartTimer = () => {
+    setTimerActive(true);
+  };
+
+  const handleRestart = () => {
+    setCurrentQ(0);
     setShowAnswer(false);
-    localStorage.setItem(`quiz_showanswer_${roomCode}`, "false");
+    setTimer(15);
+    setTimerActive(false);
+    setGameFinished(false);
+    setScores({});
+    localStorage.removeItem("quiz_scores");
   };
 
-  const handleToggleAnswer = () => {
-    const nextState = !showAnswer;
-    setShowAnswer(nextState);
-    localStorage.setItem(`quiz_showanswer_${roomCode}`, nextState.toString());
-  };
+  const sortedScores = Object.entries(scores).sort((a, b) => b[1] - a[1]);
 
-  const currentQ = QUIZ_QUESTIONS[currentQuestionIndex];
-  const scores: { [key: string]: number } = JSON.parse(localStorage.getItem(`quiz_scores_${roomCode}`) || "{}");
-  const sortedPlayers = [...players].sort((a, b) => (scores[b] || 0) - (scores[a] || 0));
+  if (gameFinished) {
+    return (
+      <div className="min-h-screen bg-gray-900 text-white p-8 flex flex-col items-center">
+        <h1 className="text-4xl font-bold text-teal-400 mb-8">🏆 Podium Final 🏆</h1>
+        
+        {/* Podium Top 3 */}
+        <div className="flex justify-center items-end gap-4 mb-10 w-full max-w-md h-48">
+          {/* 2ème Place */}
+          {sortedScores[1] && (
+            <div className="flex flex-col items-center flex-1">
+              <span className="font-bold text-lg text-gray-300">{sortedScores[1][0]}</span>
+              <span className="text-sm text-gray-400 mb-1">{sortedScores[1][1]} pts</span>
+              <div className="bg-gray-400 w-full h-32 rounded-t-lg flex items-center justify-center text-2xl font-bold text-gray-900">
+                🥈
+              </div>
+            </div>
+          )}
+
+          {/* 1ère Place */}
+          {sortedScores[0] && (
+            <div className="flex flex-col items-center flex-1">
+              <span className="font-bold text-xl text-yellow-400">{sortedScores[0][0]}</span>
+              <span className="text-sm text-yellow-300 mb-1">{sortedScores[0][1]} pts</span>
+              <div className="bg-yellow-500 w-full h-40 rounded-t-lg flex items-center justify-center text-3xl font-bold text-gray-900">
+                🥇
+              </div>
+            </div>
+          )}
+
+          {/* 3ème Place */}
+          {sortedScores[2] && (
+            <div className="flex flex-col items-center flex-1">
+              <span className="font-bold text-lg text-amber-600">{sortedScores[2][0]}</span>
+              <span className="text-sm text-gray-400 mb-1">{sortedScores[2][1]} pts</span>
+              <div className="bg-amber-700 w-full h-24 rounded-t-lg flex items-center justify-center text-2xl font-bold text-gray-900">
+                🥉
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Reste du classement */}
+        {sortedScores.length > 3 && (
+          <div className="w-full max-w-md bg-gray-800 rounded-lg p-4 mb-8">
+            <h3 className="text-lg font-bold mb-2 border-b border-gray-700 pb-2">Classement</h3>
+            {sortedScores.slice(3).map(([name, score], idx) => (
+              <div key={name} className="flex justify-between py-1 border-b border-gray-700/50">
+                <span>{idx + 4}. {name}</span>
+                <span className="font-bold">{score} pts</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <button
+          onClick={handleRestart}
+          className="bg-teal-500 hover:bg-teal-600 text-black font-bold py-3 px-6 rounded-lg text-lg transition"
+        >
+          Nouvelle Partie 🔄
+        </button>
+      </div>
+    );
+  }
+
+  const q = questions[currentQ];
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "#60a5fa", fontFamily: "serif", margin: 0, justifyContent: "space-between", color: "#000" }}>
-      <header style={{ background: "#000", color: "#fff", padding: "12px 30px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <div style={{ width: "24px", height: "18px", background: "#2dd4bf", borderRadius: "12px", border: "1px solid #5eead4" }}></div>
-          <span style={{ fontStyle: "italic", fontSize: "18px", letterSpacing: "1px" }}>BUZZER</span>
+    <div className="min-h-screen bg-gray-900 text-white p-8 flex flex-col justify-between">
+      <div>
+        <div className="flex justify-between items-center mb-6">
+          <span className="text-lg font-bold text-teal-400">
+            Question {currentQ + 1} / {questions.length}
+          </span>
+          <span className={`text-2xl font-bold ${timer <= 5 ? "text-red-500 animate-pulse" : "text-teal-400"}`}>
+            ⏱️ {timer}s
+          </span>
         </div>
-        <button onClick={onBack} style={{ background: "#fff", color: "#000", border: "none", padding: "6px 18px", borderRadius: "20px", cursor: "pointer", fontFamily: "serif", fontSize: "14px", fontWeight: "bold" }}>
-          Deconnexion
+
+        <h2 className="text-2xl font-bold mb-6">{q.question}</h2>
+
+        <div className="grid grid-cols-2 gap-4 mb-6">
+          {q.options.map((opt, i) => {
+            const isCorrect = i === q.correctAnswer;
+            return (
+              <div
+                key={i}
+                className={`p-4 rounded-lg font-semibold text-center border-2 ${
+                  showAnswer
+                    ? isCorrect
+                      ? "bg-green-600 border-green-400 text-white"
+                      : "bg-gray-800 border-gray-700 text-gray-500"
+                    : "bg-gray-800 border-gray-700"
+                }`}
+              >
+                {opt}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="flex gap-4">
+        <button
+          onClick={handleStartTimer}
+          disabled={timerActive || timer === 0}
+          className="flex-1 bg-teal-500 hover:bg-teal-600 disabled:opacity-50 text-black font-bold py-3 rounded-lg text-lg"
+        >
+          Lancer le timer ⏱️
         </button>
-      </header>
-
-      <main style={{ padding: "30px 50px", display: "flex", flexDirection: "column", flex: 1 }}>
-        <div style={{ fontStyle: "italic", fontSize: "32px", color: "#fff", marginBottom: "30px", fontWeight: "bold", letterSpacing: "2px", textShadow: "0 2px 4px rgba(0,0,0,0.1)" }}>
-          BUZZER
-        </div>
-
-        <div style={{ display: "flex", gap: "50px", alignItems: "flex-start", flex: 1 }}>
-          <div style={{ display: "flex", flexDirection: "column", gap: "20px", width: "280px" }}>
-            <button 
-              onClick={() => { setGameStarted(true); setActiveTab("game"); }}
-              style={{ background: "#e8d7f5", color: "#7c3aed", border: "none", padding: "16px 20px", borderRadius: "30px", fontSize: "20px", fontWeight: "bold", cursor: "pointer", fontFamily: "serif", boxShadow: "0 4px 10px rgba(0,0,0,0.15)", textAlign: "center" }}>
-              {gameStarted ? "Tableau de jeu" : "Lancer la partie"}
-            </button>
-            <button 
-              onClick={() => setActiveTab("ranking")}
-              style={{ background: "#1e3a8a", color: "#fff", border: "none", padding: "16px 20px", borderRadius: "30px", fontSize: "20px", fontWeight: "bold", cursor: "pointer", fontFamily: "serif", boxShadow: "0 4px 10px rgba(0,0,0,0.15)", textAlign: "center" }}>
-              Classement
-            </button>
-            <button 
-              onClick={() => setActiveTab("members")}
-              style={{ background: "#1e3a8a", color: "#fff", border: "none", padding: "16px 20px", borderRadius: "30px", fontSize: "20px", fontWeight: "bold", cursor: "pointer", fontFamily: "serif", boxShadow: "0 4px 10px rgba(0,0,0,0.15)", textAlign: "center" }}>
-              Membres ({players.length})
-            </button>
-          </div>
-
-          <div style={{ flex: 1, background: "#e9d5ff", border: "2px solid #fff", borderRadius: "10px", padding: "30px", minHeight: "350px", boxShadow: "0 10px 25px rgba(0,0,0,0.1)", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-            {activeTab === "game" && (
-              <div>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "15px", fontSize: "14px", fontWeight: "bold", color: "#581c87", background: "rgba(124, 58, 237, 0.1)", padding: "8px 12px", borderRadius: "6px" }}>
-                  <span>Question {currentQuestionIndex + 1} / {QUIZ_QUESTIONS.length}</span>
-                  <span style={{ letterSpacing: "1px", background: "#7c3aed", color: "#fff", padding: "2px 8px", borderRadius: "4px" }}>Salon : {roomCode}</span>
-                  <span>{currentQ.category}</span>
-                </div>
-                <h3 style={{ fontSize: "22px", fontWeight: "bold", marginBottom: "20px", color: "#2e1065" }}>
-                  {currentQ.question}
-                </h3>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "20px" }}>
-                  {currentQ.options.map((opt, idx) => {
-                    const isCorrect = idx === currentQ.correctAnswerIndex;
-                    return (
-                      <div key={idx} style={{ padding: "12px 15px", background: showAnswer && isCorrect ? "#bbf7d0" : "#fff", borderRadius: "8px", border: showAnswer && isCorrect ? "2px solid #16a34a" : "1px solid #d8b4fe", fontSize: "15px" }}>
-                        <b>{String.fromCharCode(65 + idx)}.</b> {opt}
-                      </div>
-                    );
-                  })}
-                </div>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid #d8b4fe", paddingTop: "15px" }}>
-                  <button onClick={handleToggleAnswer} style={{ background: "#7c3aed", color: "#fff", border: "none", padding: "8px 16px", borderRadius: "8px", cursor: "pointer", fontWeight: "bold" }}>
-                    {showAnswer ? "Masquer la reponse" : "Afficher la reponse"}
-                  </button>
-                  {currentQuestionIndex < QUIZ_QUESTIONS.length - 1 ? (
-                    <button onClick={() => updateQuestionIndex(currentQuestionIndex + 1)} style={{ background: "#2563eb", color: "#fff", border: "none", padding: "8px 16px", borderRadius: "8px", cursor: "pointer", fontWeight: "bold" }}>
-                      Question Suivante ➔
-                    </button>
-                  ) : (
-                    <span style={{ fontWeight: "bold", color: "#16a34a" }}>Fin du Quiz !</span>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {activeTab === "ranking" && (
-              <div>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-                  <h3 style={{ fontSize: "24px", fontWeight: "bold", margin: 0, color: "#2e1065" }}>Classement en direct</h3>
-                  <span style={{ fontSize: "14px", fontWeight: "bold", background: "#7c3aed", color: "#fff", padding: "4px 10px", borderRadius: "6px" }}>Salon : {roomCode}</span>
-                </div>
-                <ol style={{ fontSize: "18px", paddingLeft: "20px", display: "flex", flexDirection: "column", gap: "10px" }}>
-                  {sortedPlayers.map((p, idx) => (
-                    <li key={idx} style={{ background: "#fff", padding: "10px 15px", borderRadius: "8px", display: "flex", justifyContent: "space-between" }}>
-                      <span>{idx + 1}. {p}</span>
-                      <span style={{ fontWeight: "bold", color: "#16a34a" }}>{scores[p] || 0} pts</span>
-                    </li>
-                  ))}
-                </ol>
-              </div>
-            )}
-
-            {activeTab === "members" && (
-              <div>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-                  <h3 style={{ fontSize: "24px", fontWeight: "bold", margin: 0, color: "#2e1065" }}>Joueurs connectes</h3>
-                  <span style={{ fontSize: "14px", fontWeight: "bold", background: "#7c3aed", color: "#fff", padding: "4px 10px", borderRadius: "6px" }}>Salon : {roomCode}</span>
-                </div>
-                <ul style={{ fontSize: "18px", paddingLeft: "20px", display: "flex", flexDirection: "column", gap: "10px" }}>
-                  {players.map((p, idx) => (
-                    <li key={idx} style={{ background: "#fff", padding: "10px 15px", borderRadius: "8px" }}>
-                      🟢 {p} (Connecté)
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-        </div>
-      </main>
-
-      <footer style={{ background: "#000", color: "#fff", textAlign: "center", padding: "12px", fontSize: "13px", fontStyle: "italic" }}>
-        Equipe buzzer - 2026
-      </footer>
+        <button
+          onClick={handleReveal}
+          className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-3 rounded-lg text-lg"
+        >
+          Révéler Réponse 👁️
+        </button>
+        <button
+          onClick={handleNext}
+          className="flex-1 bg-teal-500 hover:bg-teal-600 text-black font-bold py-3 rounded-lg text-lg"
+        >
+          {currentQ < questions.length - 1 ? "Question Suivante ➡️" : "Voir le Podium 🏆"}
+        </button>
+      </div>
     </div>
   );
-};
+}
