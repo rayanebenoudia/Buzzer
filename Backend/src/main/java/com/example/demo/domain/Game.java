@@ -34,15 +34,21 @@ public class Game {
     }
 
     public GameState getGameState() {
+
         return gameState;
     }
 
     public Instant getQuestionStartedAt() {
+
         return questionStartedAt;
     }
 
     public String getCode() {
         return code;
+    }
+
+    public QuestionState getQuestionState(){
+        return questionState;
     }
 
     public void startNextQuestion(){
@@ -57,11 +63,9 @@ public class Game {
         questionState= QuestionState.OPEN;
         answers.clear();
 
-
-
     }
 
-   public void lockedQuestion(){
+    public void lockedQuestion(){
         if ( questionState != QuestionState.OPEN) {
              throw new IllegalStateException( "Question is not open");
         }
@@ -84,9 +88,38 @@ public class Game {
 
        answers.put( playerId, choiceIndex) ;
 
+        }
+    public void revealQuestion(){
+        if ( questionState != QuestionState.LOCKED) {
+            throw new IllegalStateException("Question is not locked");
+        }
+        questionState = QuestionState.REVEALED;
+    }
+
+    public void finishGame() {
+
+        if (gameState != GameState.IN_PROGRESS){
+            throw new IllegalStateException("Game is not in progress");
+        }
+        if (questionState != QuestionState.REVEALED){
+            throw new IllegalStateException("question is not revealed");
 
         }
+        gameState = GameState.FINISHED;
 
+    }
+
+  public boolean hasAnswered( UUID playerId){
+        return answers.containsKey(playerId);
+
+  }
+
+    public Question getCurrentQuestion() {
+        if(currentQuestionIndex < 0){
+            throw new IllegalStateException("No question selected yet");
+        }
+        return questions.get(currentQuestionIndex);
+    }
 }
 
 
