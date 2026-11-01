@@ -1,0 +1,72 @@
+[
+  {
+    "id": 1,
+    "text": "À vélo, quel équipement est obligatoire pour être visible la nuit ou lorsque la visibilité est insuffisante ?",
+    "answers": ["Un gilet rouge", "Un éclairage et des dispositifs réfléchissants", "Une lampe sur le casque uniquement", "Une sonnette uniquement"],
+    "durationSeconds": 20,
+    "answerPosition": 1
+  },
+  {
+    "id": 2,
+    "text": "Quelle position met-on généralement à une personne inconsciente qui respire normalement ?",
+    "answers": ["Position assise", "Position debout", "Position latérale de sécurité", "Position allongée sur le ventre"],
+    "durationSeconds": 20,
+    "answerPosition": 2
+  },
+  {
+    "id": 3,
+    "text": "Quelle épice est souvent considérée comme l'une des plus chères au monde ?",
+    "answers": ["Cumin", "Safran", "Paprika", "Cannelle"],
+    "durationSeconds": 20,
+    "answerPosition": 1
+  },
+  {
+    "id": 4,
+    "text": "Quel plat tunisien est célèbre pour être servi avec un œuf dans une feuille de brick ?",
+    "answers": ["Lablabi", "Brik", "Ojja", "Couscous"],
+    "durationSeconds": 20,
+    "answerPosition": 1
+  },
+  {
+    "id": 5,
+    "text": "Quelle fête marque le Nouvel An amazigh ?",
+    "answers": ["Yennayer", "Achoura", "Mawlid", "Aïd el-Fitr"],
+    "durationSeconds": 20,
+    "answerPosition": 0
+  },
+  {
+    "id": 6,
+    "text": "Dans quelle tradition retrouve-t-on des cavaliers réalisant des démonstrations synchronisées à cheval ?",
+    "answers": ["Le henné", "La fantasia", "Le Sbouâ", "Le Yennayer"],
+    "durationSeconds": 20,
+    "answerPosition": 1
+  },
+  {
+    "id": 7,
+    "text": "Quel est le seul métal liquide à température ambiante ?",
+    "answers": ["Fer", "Mercure", "Argent", "Aluminium"],
+    "durationSeconds": 20,
+    "answerPosition": 1
+  },
+  {
+    "id": 8,
+    "text": "Quel est le plus grand océan de la planète ?",
+    "answers": ["Atlantique", "Indien", "Pacifique", "Arctique"],
+    "durationSeconds": 20,
+    "answerPosition": 2
+  },
+  {
+    "id": 9,
+    "text": "Combien de députés siègent à l'Assemblée nationale française ?",
+    "answers": ["348", "577", "620", "705"],
+    "durationSeconds": 20,
+    "answerPosition": 1
+  },
+  {
+    "id": 10,
+    "text": "Quel pays est le siège principal des institutions de l'Union européenne ?",
+    "answers": ["France", "Allemagne", "Belgique", "Suisse"],
+    "durationSeconds": 20,
+    "answerPosition": 2
+  }
+]
