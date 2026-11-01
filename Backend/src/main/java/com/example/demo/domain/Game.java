@@ -48,7 +48,7 @@ public class Game {
     public void startNextQuestion(){
 
         if (currentQuestionIndex + 1 >= questions.size()){
-            throw new IllegalStateException(" No more question");
+            throw new IllegalStateException("No more question");
         }
 
         gameState = GameState.IN_PROGRESS;
@@ -61,5 +61,32 @@ public class Game {
 
     }
 
+   public void lockedQuestion(){
+        if ( questionState != QuestionState.OPEN) {
+             throw new IllegalStateException( "Question is not open");
+        }
+        questionState = QuestionState.LOCKED;
+    }
+
+    public void submitAnswer( UUID playerId, int choiceIndex) {
+        if (questionState != QuestionState.OPEN) {
+            throw new IllegalStateException("question is not open");
+        }
+        if (!players.containsKey(playerId)) {
+            throw new IllegalStateException("player doesn't exist");
+        }
+        if (answers.containsKey(playerId)) {
+            throw new IllegalStateException("already answered");
+        }
+        if (choiceIndex < 0 || choiceIndex >= questions.get(currentQuestionIndex).answers().size()){
+            throw new IllegalArgumentException(" Invalid answer");
+        }
+
+       answers.put( playerId, choiceIndex) ;
+
+
+        }
 
 }
+
+
