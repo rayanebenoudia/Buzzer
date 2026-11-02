@@ -1,200 +1,255 @@
-﻿import { useState, useEffect } from "react";
-import { questions } from "../data/questions";
+﻿import { useState } from "react";
 
-interface ScoreData {
-  [playerName: string]: number;
-}
+export function HostGame() {
+  const [activeTab, setActiveTab] = useState<"game" | "leaderboard" | "members">("game");
+  const [isGameStarted, setIsGameStarted] = useState<boolean>(false);
 
-export default function HostDashboard() {
-  const [currentQ, setCurrentQ] = useState(0);
-  const [showAnswer, setShowAnswer] = useState(false);
-  const [timer, setTimer] = useState(15);
-  const [timerActive, setTimerActive] = useState(false);
-  const [scores, setScores] = useState<ScoreData>({});
-  const [gameFinished, setGameFinished] = useState(false);
-
-  useEffect(() => {
-    localStorage.setItem("quiz_qindex", currentQ.toString());
-    localStorage.setItem("quiz_showanswer", showAnswer ? "true" : "false");
-    localStorage.setItem("quiz_finished", gameFinished ? "true" : "false");
-  }, [currentQ, showAnswer, gameFinished]);
-
-  useEffect(() => {
-    let interval: any;
-    if (timerActive && timer > 0) {
-      interval = setInterval(() => {
-        setTimer((prev) => prev - 1);
-      }, 1000);
-    } else if (timer === 0) {
-      setTimerActive(false);
-    }
-    return () => clearInterval(interval);
-  }, [timerActive, timer]);
-
-  useEffect(() => {
-    const handleStorage = () => {
-      const savedScores = localStorage.getItem("quiz_scores");
-      if (savedScores) setScores(JSON.parse(savedScores));
-    };
-    handleStorage();
-    window.addEventListener("storage", handleStorage);
-    return () => window.removeEventListener("storage", handleStorage);
-  }, []);
-
-  const handleNext = () => {
-    if (currentQ < questions.length - 1) {
-      setCurrentQ(currentQ + 1);
-      setShowAnswer(false);
-      setTimer(15);
-      setTimerActive(false);
-    } else {
-      setGameFinished(true);
-    }
-  };
-
-  const handleReveal = () => {
-    setShowAnswer(true);
-    setTimerActive(false);
-  };
-
-  const handleStartTimer = () => {
-    setTimerActive(true);
-  };
-
-  const handleRestart = () => {
-    setCurrentQ(0);
-    setShowAnswer(false);
-    setTimer(15);
-    setTimerActive(false);
-    setGameFinished(false);
-    setScores({});
-    localStorage.removeItem("quiz_scores");
-  };
-
-  const sortedScores = Object.entries(scores).sort((a, b) => b[1] - a[1]);
-
-  if (gameFinished) {
-    return (
-      <div className="min-h-screen bg-gray-900 text-white p-8 flex flex-col items-center">
-        <h1 className="text-4xl font-bold text-teal-400 mb-8">🏆 Podium Final 🏆</h1>
-        
-        {/* Podium Top 3 */}
-        <div className="flex justify-center items-end gap-4 mb-10 w-full max-w-md h-48">
-          {/* 2ème Place */}
-          {sortedScores[1] && (
-            <div className="flex flex-col items-center flex-1">
-              <span className="font-bold text-lg text-gray-300">{sortedScores[1][0]}</span>
-              <span className="text-sm text-gray-400 mb-1">{sortedScores[1][1]} pts</span>
-              <div className="bg-gray-400 w-full h-32 rounded-t-lg flex items-center justify-center text-2xl font-bold text-gray-900">
-                🥈
-              </div>
-            </div>
-          )}
-
-          {/* 1ère Place */}
-          {sortedScores[0] && (
-            <div className="flex flex-col items-center flex-1">
-              <span className="font-bold text-xl text-yellow-400">{sortedScores[0][0]}</span>
-              <span className="text-sm text-yellow-300 mb-1">{sortedScores[0][1]} pts</span>
-              <div className="bg-yellow-500 w-full h-40 rounded-t-lg flex items-center justify-center text-3xl font-bold text-gray-900">
-                🥇
-              </div>
-            </div>
-          )}
-
-          {/* 3ème Place */}
-          {sortedScores[2] && (
-            <div className="flex flex-col items-center flex-1">
-              <span className="font-bold text-lg text-amber-600">{sortedScores[2][0]}</span>
-              <span className="text-sm text-gray-400 mb-1">{sortedScores[2][1]} pts</span>
-              <div className="bg-amber-700 w-full h-24 rounded-t-lg flex items-center justify-center text-2xl font-bold text-gray-900">
-                🥉
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Reste du classement */}
-        {sortedScores.length > 3 && (
-          <div className="w-full max-w-md bg-gray-800 rounded-lg p-4 mb-8">
-            <h3 className="text-lg font-bold mb-2 border-b border-gray-700 pb-2">Classement</h3>
-            {sortedScores.slice(3).map(([name, score], idx) => (
-              <div key={name} className="flex justify-between py-1 border-b border-gray-700/50">
-                <span>{idx + 4}. {name}</span>
-                <span className="font-bold">{score} pts</span>
-              </div>
-            ))}
-          </div>
-        )}
-
-        <button
-          onClick={handleRestart}
-          className="bg-teal-500 hover:bg-teal-600 text-black font-bold py-3 px-6 rounded-lg text-lg transition"
-        >
-          Nouvelle Partie 🔄
-        </button>
-      </div>
-    );
-  }
-
-  const q = questions[currentQ];
+  // Exemple de données simulées
+  const members = ["Joueur 1", "Joueur 2", "Joueur 3", "Joueur 4"];
+  const leaderboard = [
+    { name: "Joueur 1", score: 120 },
+    { name: "Joueur 2", score: 90 },
+    { name: "Joueur 3", score: 75 },
+    { name: "Joueur 4", score: 40 },
+  ];
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-8 flex flex-col justify-between">
-      <div>
-        <div className="flex justify-between items-center mb-6">
-          <span className="text-lg font-bold text-teal-400">
-            Question {currentQ + 1} / {questions.length}
-          </span>
-          <span className={`text-2xl font-bold ${timer <= 5 ? "text-red-500 animate-pulse" : "text-teal-400"}`}>
-            ⏱️ {timer}s
+    <div style={{
+      minHeight: "100vh",
+      backgroundColor: "#85c5e5",
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "space-between",
+      fontFamily: "Georgia, serif",
+      userSelect: "none"
+    }}>
+      
+      {/* 1. BARRE SUPERIEURE NOIRE */}
+      <div style={{
+        backgroundColor: "#000000",
+        color: "#ffffff",
+        padding: "10px 24px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between"
+      }}>
+        {/* Logo + Titre BUZZER */}
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <div style={{
+            width: "36px",
+            height: "36px",
+            borderRadius: "50%",
+            backgroundColor: "#00bcd4",
+            border: "2px solid #ffffff",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center"
+          }}>
+            <div style={{ width: "22px", height: "9px", backgroundColor: "#ffffff", borderRadius: "4px" }}></div>
+          </div>
+          <span style={{ fontSize: "22px", fontWeight: "bold", fontStyle: "italic", letterSpacing: "1px" }}>
+            BUZZER
           </span>
         </div>
 
-        <h2 className="text-2xl font-bold mb-6">{q.question}</h2>
+        {/* Bouton Deconnexion */}
+        <button 
+          onClick={() => alert("Déconnexion de l'animateur")}
+          style={{
+            backgroundColor: "#ffffff",
+            color: "#000000",
+            border: "none",
+            borderRadius: "20px",
+            padding: "6px 20px",
+            fontSize: "14px",
+            fontFamily: "Georgia, serif",
+            cursor: "pointer"
+          }}
+        >
+          Deconnexion
+        </button>
+      </div>
 
-        <div className="grid grid-cols-2 gap-4 mb-6">
-          {q.options.map((opt, i) => {
-            const isCorrect = i === q.correctAnswer;
-            return (
-              <div
-                key={i}
-                className={`p-4 rounded-lg font-semibold text-center border-2 ${
-                  showAnswer
-                    ? isCorrect
-                      ? "bg-green-600 border-green-400 text-white"
-                      : "bg-gray-800 border-gray-700 text-gray-500"
-                    : "bg-gray-800 border-gray-700"
-                }`}
-              >
-                {opt}
+      {/* 2. CONTENU CENTRAL (DISPOSITION EN 2 COLONNES) */}
+      <div style={{
+        flex: 1,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "40px 60px",
+        gap: "60px"
+      }}>
+        
+        {/* Colonne Gauche : Titre + Boutons */}
+        <div style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-start",
+          width: "300px"
+        }}>
+          <h1 style={{
+            color: "#ffffff",
+            fontSize: "42px",
+            fontWeight: "normal",
+            fontStyle: "italic",
+            letterSpacing: "2px",
+            marginBottom: "30px"
+          }}>
+            BUZZER
+          </h1>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: "20px", width: "100%" }}>
+            {/* Bouton Lancer la partie */}
+            <button 
+              onClick={() => {
+                setActiveTab("game");
+                setIsGameStarted(true);
+              }}
+              style={{
+                width: "100%",
+                backgroundColor: activeTab === "game" ? "#dfccf7" : "#e2c2f6",
+                color: "#ffffff",
+                border: "none",
+                borderRadius: "25px",
+                padding: "12px 20px",
+                fontSize: "20px",
+                fontFamily: "Georgia, serif",
+                cursor: "pointer",
+                textAlign: "center",
+                textShadow: "1px 1px 2px rgba(0,0,0,0.1)",
+                boxShadow: activeTab === "game" ? "inset 0 2px 4px rgba(0,0,0,0.2)" : "none"
+              }}
+            >
+              {isGameStarted ? "Partie en cours" : "Lancer la partie"}
+            </button>
+
+            {/* Bouton Classement */}
+            <button 
+              onClick={() => setActiveTab("leaderboard")}
+              style={{
+                width: "100%",
+                backgroundColor: activeTab === "leaderboard" ? "#153a52" : "#1e5272",
+                color: "#ffffff",
+                border: "none",
+                borderRadius: "25px",
+                padding: "12px 20px",
+                fontSize: "20px",
+                fontFamily: "Georgia, serif",
+                cursor: "pointer",
+                textAlign: "center"
+              }}
+            >
+              Classement
+            </button>
+
+            {/* Bouton Membres */}
+            <button 
+              onClick={() => setActiveTab("members")}
+              style={{
+                width: "100%",
+                backgroundColor: activeTab === "members" ? "#153a52" : "#1e5272",
+                color: "#ffffff",
+                border: "none",
+                borderRadius: "25px",
+                padding: "12px 20px",
+                fontSize: "20px",
+                fontFamily: "Georgia, serif",
+                cursor: "pointer",
+                textAlign: "center"
+              }}
+            >
+              Membres ({members.length})
+            </button>
+          </div>
+        </div>
+
+        {/* Colonne Droite : Cadre Dynamique */}
+        <div style={{
+          flex: 1,
+          maxWidth: "500px",
+          minHeight: "320px",
+          backgroundColor: "#dfccf7",
+          border: "4px solid #ffffff",
+          boxSizing: "border-box",
+          padding: "24px",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between"
+        }}>
+          {activeTab === "game" && (
+            <div>
+              <h2 style={{ color: "#ffffff", fontSize: "24px", marginTop: 0, marginBottom: "16px" }}>
+                {isGameStarted ? "Question en cours" : "Zone de jeu"}
+              </h2>
+              <p style={{ color: "#ffffff", fontSize: "16px" }}>
+                {isGameStarted 
+                  ? "La partie est lancée ! En attente des réponses des joueurs..." 
+                  : "Cliquez sur 'Lancer la partie' pour démarrer."}
+              </p>
+            </div>
+          )}
+
+          {activeTab === "leaderboard" && (
+            <div>
+              <h2 style={{ color: "#ffffff", fontSize: "24px", marginTop: 0, marginBottom: "16px" }}>
+                Classement
+              </h2>
+              <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+                {leaderboard.map((item, index) => (
+                  <li key={index} style={{
+                    color: "#ffffff",
+                    fontSize: "18px",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    padding: "6px 0",
+                    borderBottom: "1px solid rgba(255,255,255,0.3)"
+                  }}>
+                    <span>{index + 1}. {item.name}</span>
+                    <span>{item.score} pts</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {activeTab === "members" && (
+            <div>
+              <h2 style={{ color: "#ffffff", fontSize: "24px", marginTop: 0, marginBottom: "16px" }}>
+                Joueurs connectés
+              </h2>
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                {members.map((member, index) => (
+                  <div key={index} style={{
+                    color: "#ffffff",
+                    fontSize: "18px",
+                    backgroundColor: "rgba(255,255,255,0.2)",
+                    padding: "8px 12px",
+                    borderRadius: "8px"
+                  }}>
+                    🟢 {member}
+                  </div>
+                ))}
               </div>
-            );
-          })}
+            </div>
+          )}
         </div>
+
       </div>
 
-      <div className="flex gap-4">
-        <button
-          onClick={handleStartTimer}
-          disabled={timerActive || timer === 0}
-          className="flex-1 bg-teal-500 hover:bg-teal-600 disabled:opacity-50 text-black font-bold py-3 rounded-lg text-lg"
-        >
-          Lancer le timer ⏱️
-        </button>
-        <button
-          onClick={handleReveal}
-          className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-3 rounded-lg text-lg"
-        >
-          Révéler Réponse 👁️
-        </button>
-        <button
-          onClick={handleNext}
-          className="flex-1 bg-teal-500 hover:bg-teal-600 text-black font-bold py-3 rounded-lg text-lg"
-        >
-          {currentQ < questions.length - 1 ? "Question Suivante ➡️" : "Voir le Podium 🏆"}
-        </button>
+      {/* 3. BARRE INFERIEURE NOIRE */}
+      <div style={{
+        backgroundColor: "#000000",
+        color: "#ffffff",
+        textAlign: "center",
+        padding: "10px",
+        fontSize: "14px",
+        fontStyle: "italic"
+      }}>
+        Créer par l'équipe buzzer - 2026
       </div>
+
     </div>
   );
 }
+
+export const HostDashboard = HostGame;

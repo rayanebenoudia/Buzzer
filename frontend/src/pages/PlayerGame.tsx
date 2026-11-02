@@ -1,127 +1,175 @@
-﻿import { useState, useEffect } from "react";
-import { questions } from "../data/questions";
+﻿import { useState } from "react";
 
-interface ScoreData {
-  [playerName: string]: number;
-}
-
-export default function PlayerGame() {
-  const [playerName, setPlayerName] = useState("");
-  const [currentQ, setCurrentQ] = useState(0);
-  const [showAnswer, setShowAnswer] = useState(false);
-  const [selectedOption, setSelectedOption] = useState<number | null>(null);
-  const [scores, setScores] = useState<ScoreData>({});
-  const [gameFinished, setGameFinished] = useState(false);
-
-  useEffect(() => {
-    const savedName = localStorage.getItem("quiz_player_name") || "Joueur Anonyme";
-    setPlayerName(savedName);
-
-    const syncState = () => {
-      const qIdx = localStorage.getItem("quiz_qindex");
-      const answerShown = localStorage.getItem("quiz_showanswer");
-      const finished = localStorage.getItem("quiz_finished");
-      const savedScores = localStorage.getItem("quiz_scores");
-
-      if (qIdx !== null && parseInt(qIdx) !== currentQ) {
-        setCurrentQ(parseInt(qIdx));
-        setSelectedOption(null);
-      }
-      setShowAnswer(answerShown === "true");
-      setGameFinished(finished === "true");
-      if (savedScores) setScores(JSON.parse(savedScores));
-    };
-
-    syncState();
-    window.addEventListener("storage", syncState);
-    const interval = setInterval(syncState, 500);
-
-    return () => {
-      window.removeEventListener("storage", syncState);
-      clearInterval(interval);
-    };
-  }, [currentQ]);
-
-  const handleSelect = (index: number) => {
-    if (selectedOption !== null || showAnswer || gameFinished) return;
-    setSelectedOption(index);
-
-    const isCorrect = index === questions[currentQ].correctAnswer;
-    const currentScores = JSON.parse(localStorage.getItem("quiz_scores") || "{}");
-    const oldScore = currentScores[playerName] || 0;
-    const newScore = isCorrect ? oldScore + 100 : oldScore;
-
-    const updated = { ...currentScores, [playerName]: newScore };
-    localStorage.setItem("quiz_scores", JSON.stringify(updated));
-    setScores(updated);
-  };
-
-  const sortedScores = Object.entries(scores).sort((a, b) => b[1] - a[1]);
-  const myRank = sortedScores.findIndex(([name]) => name === playerName) + 1;
-  const myScore = scores[playerName] || 0;
-
-  if (gameFinished) {
-    return (
-      <div className="min-h-screen bg-gray-900 text-white p-6 flex flex-col items-center justify-center">
-        <h1 className="text-3xl font-bold text-teal-400 mb-4">Fin de la Partie ! 🏆</h1>
-        <p className="text-xl mb-2">Bravo <span className="text-teal-300 font-bold">{playerName}</span> !</p>
-        <div className="bg-gray-800 p-6 rounded-xl border-2 border-teal-500 text-center mb-6 w-full max-w-xs">
-          <p className="text-gray-400 mb-1">Ton score final</p>
-          <p className="text-4xl font-extrabold text-teal-400 mb-4">{myScore} pts</p>
-          {myRank > 0 && (
-            <p className="text-lg">
-              Position : <span className="font-bold text-yellow-400">#{myRank}</span> / {sortedScores.length}
-            </p>
-          )}
-        </div>
-        <p className="text-sm text-gray-500">En attente de l'hôte pour relancer une partie...</p>
-      </div>
-    );
-  }
-
-  const q = questions[currentQ];
+export function PlayerGame() {
+  const [selectedOption, setSelectedOption] = useState<number>(0);
+  const [isValidated, setIsValidated] = useState<boolean>(false);
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-6 flex flex-col justify-between">
-      <div>
-        <div className="flex justify-between items-center mb-4">
-          <span className="text-sm text-gray-400">Joueur : <strong className="text-teal-400">{playerName}</strong></span>
-          <span className="text-sm font-bold text-teal-400">Score : {myScore} pts</span>
+    <div style={{
+      minHeight: "100vh",
+      backgroundColor: "#85c5e5",
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "space-between",
+      fontFamily: "Georgia, serif",
+      userSelect: "none"
+    }}>
+      
+      {/* 1. BARRE SUPERIEURE NOIRE */}
+      <div style={{
+        backgroundColor: "#000000",
+        color: "#ffffff",
+        padding: "10px 16px",
+        display: "flex",
+        alignItems: "center",
+        gap: "12px"
+      }}>
+        <div style={{
+          width: "32px",
+          height: "32px",
+          borderRadius: "50%",
+          backgroundColor: "#00bcd4",
+          border: "2px solid #ffffff",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center"
+        }}>
+          <div style={{ width: "20px", height: "8px", backgroundColor: "#ffffff", borderRadius: "4px" }}></div>
         </div>
-
-        <h2 className="text-xl font-bold mb-6">{q.question}</h2>
-
-        <div className="flex flex-col gap-3">
-          {q.options.map((opt, i) => {
-            const isSelected = selectedOption === i;
-            const isCorrect = i === q.correctAnswer;
-
-            let btnStyle = "bg-gray-800 border-gray-700 hover:bg-gray-700";
-            if (showAnswer) {
-              if (isCorrect) btnStyle = "bg-green-600 border-green-400 text-white";
-              else if (isSelected) btnStyle = "bg-red-600 border-red-400 text-white";
-              else btnStyle = "bg-gray-800 border-gray-700 opacity-50";
-            } else if (isSelected) {
-              btnStyle = "bg-teal-600 border-teal-400 text-white";
-            }
-
-            return (
-              <button
-                key={i}
-                onClick={() => handleSelect(i)}
-                disabled={selectedOption !== null || showAnswer}
-                className={`p-4 rounded-xl border-2 font-semibold text-left transition ${btnStyle}`}
-              >
-                {opt}
-              </button>
-            );
-          })}
-        </div>
+        <span style={{ fontSize: "20px", fontWeight: "bold", fontStyle: "italic", letterSpacing: "1px" }}>
+          BUZZER
+        </span>
       </div>
 
-      <div className="text-center text-sm text-gray-500 mt-4">
-        {selectedOption !== null && !showAnswer && "Choix enregistré ! En attente de la réponse..."}
+      {/* 2. CONTENU CENTRAL */}
+      <div style={{
+        flex: 1,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "16px"
+      }}>
+        
+        {/* Titre BUZZER blanc au-dessus */}
+        <h1 style={{
+          color: "#ffffff",
+          fontSize: "36px",
+          fontWeight: "normal",
+          letterSpacing: "1px",
+          marginBottom: "24px",
+          textAlign: "center"
+        }}>
+          BUZZER
+        </h1>
+
+        {/* Carte Blanche Centrale */}
+        <div style={{
+          backgroundColor: "#ececec",
+          width: "100%",
+          maxWidth: "380px",
+          padding: "24px",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          minHeight: "400px",
+          boxSizing: "border-box"
+        }}>
+          
+          <div>
+            {/* Infos Question / Temps */}
+            <div style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              fontSize: "15px",
+              color: "#111111",
+              marginBottom: "20px"
+            }}>
+              <span>Questions 1/10</span>
+              <span>Temps - 05</span>
+            </div>
+
+            {/* BLOCS DE COULEURS VIERGES */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "24px" }}>
+              {[0, 1, 2, 3].map((index) => {
+                const isSelected = selectedOption === index;
+                return (
+                  <button
+                    key={index}
+                    onClick={() => !isValidated && setSelectedOption(index)}
+                    disabled={isValidated}
+                    style={{
+                      width: "100%",
+                      height: "38px",
+                      border: "none",
+                      outline: "none",
+                      cursor: isValidated ? "default" : "pointer",
+                      backgroundColor: isSelected ? "#8574f3" : "#d3d3d3",
+                      transition: "background-color 0.15s ease",
+                      opacity: isValidated && !isSelected ? 0.6 : 1
+                    }}
+                  />
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Bouton Validée et statut en petit */}
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
+            <button
+              onClick={() => setIsValidated(true)}
+              disabled={isValidated}
+              style={{
+                backgroundColor: isValidated ? "#a5d6a7" : "#82f58e",
+                color: isValidated ? "#444444" : "#000000",
+                padding: "6px 24px",
+                fontSize: "15px",
+                fontFamily: "Georgia, serif",
+                border: "none",
+                outline: "none",
+                cursor: isValidated ? "default" : "pointer",
+                marginBottom: "16px"
+              }}
+            >
+              Validée
+            </button>
+
+            <div style={{
+              width: "100%",
+              textAlign: "right",
+              fontSize: isValidated ? "11px" : "14px",
+              fontStyle: isValidated ? "italic" : "normal",
+              color: isValidated ? "#2e7d32" : "#111111"
+            }}>
+              {isValidated ? "Réponse enregistrée" : "En attente"}
+            </div>
+          </div>
+
+        </div>
+
       </div>
+
+      {/* 3. MENTION DECONNECTE EN BAS A DROITE */}
+      <div style={{ paddingRight: "24px", paddingBottom: "8px", textAlign: "right" }}>
+        <span style={{ color: "#ff3333", fontWeight: "normal", fontSize: "22px" }}>
+          Deconnecté
+        </span>
+      </div>
+
+      {/* 4. BARRE INFERIEURE NOIRE */}
+      <div style={{
+        backgroundColor: "#000000",
+        color: "#ffffff",
+        textAlign: "center",
+        padding: "8px",
+        fontSize: "13px",
+        fontStyle: "italic"
+      }}>
+        Créer par l'équipe buzzer - 2026
+      </div>
+
     </div>
   );
 }
