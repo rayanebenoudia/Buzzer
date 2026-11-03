@@ -1,64 +1,130 @@
-﻿import React from 'react';
+﻿import { useState } from "react";
 
 interface HomeProps {
-  onSelectRole: (role: 'player' | 'host') => void;
+  onNavigate: (page: "player-login" | "host-game") => void;
 }
 
-export const Home: React.FC<HomeProps> = ({ onSelectRole }) => {
+// Home screen component
+export function Home({ onNavigate }: HomeProps) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: '#93c5fd', fontFamily: 'serif', margin: 0, justifyContent: 'space-between' }}>
-      {/* Barre noire du haut */}
-      <header style={{ background: '#000', color: '#fff', padding: '15px 30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <span style={{ fontStyle: 'italic', fontSize: '18px', letterSpacing: '1px' }}>BUZZER</span>
+    <div style={{
+      minHeight: "100vh",
+      backgroundColor: "#85c5e5",
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "space-between",
+      fontFamily: "Georgia, serif",
+      userSelect: "none"
+    }}>
+      {/* Top Black Bar */}
+      <div style={{
+        backgroundColor: "#000000",
+        color: "#ffffff",
+        padding: "10px 24px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between"
+      }}>
+        <span style={{ fontSize: "20px", fontWeight: "bold", fontStyle: "italic", letterSpacing: "1px" }}>
+          BUZZER
+        </span>
         <button 
-          onClick={() => onSelectRole('host')}
-          style={{ background: '#fff', color: '#000', border: 'none', padding: '6px 18px', borderRadius: '20px', cursor: 'pointer', fontFamily: 'serif', fontSize: '14px' }}
+          onClick={() => onNavigate("host-game")}
+          style={{
+            backgroundColor: "#ffffff",
+            color: "#000000",
+            border: "none",
+            borderRadius: "20px",
+            padding: "6px 20px",
+            fontSize: "14px",
+            fontFamily: "Georgia, serif",
+            cursor: "pointer",
+            fontWeight: "bold"
+          }}
         >
           Animateur
         </button>
-      </header>
+      </div>
 
-      {/* Corps de la page */}
-      <main style={{ textAlign: 'center', padding: '20px' }}>
-        <h1 style={{ fontSize: '42px', fontStyle: 'italic', color: '#fff', marginBottom: '20px', letterSpacing: '2px', textShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>BUZZER</h1>
-        
-        {/* Illustration SVG exacte du logo buzzer */}
-        <div style={{ margin: '0 auto 25px auto', width: '200px', height: '160px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <svg viewBox='0 0 200 160' width='100%' height='100%'>
-            {/* Lueurs / rayons */}
-            <rect x='45' y='20' width='8' height='20' rx='4' fill='#e0f2fe' transform='rotate(-30 49 30)' />
-            <rect x='96' y='10' width='8' height='20' rx='4' fill='#e0f2fe' />
-            <rect x='147' y='20' width='8' height='20' rx='4' fill='#e0f2fe' transform='rotate(30 151 30)' />
-            
-            {/* Base sombre du buzzer */}
-            <ellipse cx='100' cy='125' rx='75' ry='25' fill='#1e3a4c' />
-            <ellipse cx='100' cy='120' rx='75' ry='25' fill='#244d63' />
-            
-            {/* Corps cylindrique du bouton */}
-            <path d='M 25 100 L 25 120 A 75 25 0 0 0 175 120 L 175 100 Z' fill='#1b4959' />
-            
-            {/* Bouton turquoise en relief */}
-            <ellipse cx='100' cy='95' rx='65' ry='22' fill='#14b8a6' />
-            <path d='M 35 75 L 35 95 A 65 22 0 0 0 165 95 L 165 75 Z' fill='#0d9488' />
-            <ellipse cx='100' cy='75' rx='65' ry='22' fill='#2dd4bf' />
-            
-            {/* Reflet lumineux sur le bouton */}
-            <ellipse cx='80' cy='70' rx='35' ry='10' fill='#5eead4' opacity='0.6' />
-          </svg>
+      {/* Central Content */}
+      <div style={{
+        flex: 1,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "20px",
+        gap: "30px"
+      }}>
+        <h1 style={{
+          color: "#ffffff",
+          fontSize: "40px",
+          fontWeight: "normal",
+          fontStyle: "italic",
+          letterSpacing: "2px",
+          margin: 0,
+          textAlign: "center"
+        }}>
+          BUZZER
+        </h1>
+
+        {/* Buzzer Illustration */}
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", position: "relative" }}>
+          <div style={{ display: "flex", gap: "24px", marginBottom: "8px" }}>
+            <div style={{ width: "4px", height: "12px", backgroundColor: "#ffffff", borderRadius: "2px", transform: "rotate(-25deg)" }}></div>
+            <div style={{ width: "4px", height: "16px", backgroundColor: "#ffffff", borderRadius: "2px" }}></div>
+            <div style={{ width: "4px", height: "12px", backgroundColor: "#ffffff", borderRadius: "2px", transform: "rotate(25deg)" }}></div>
+          </div>
+          <div style={{
+            width: "140px",
+            height: "45px",
+            backgroundColor: "#2bc4ad",
+            borderRadius: "50%",
+            border: "3px solid #1c8877",
+            boxShadow: "inset 0 6px 10px rgba(255,255,255,0.4), 0 4px 6px rgba(0,0,0,0.2)",
+            zIndex: 2
+          }}></div>
+          <div style={{
+            width: "180px",
+            height: "55px",
+            backgroundColor: "#1c3548",
+            borderRadius: "50%",
+            marginTop: "-25px",
+            boxShadow: "0 8px 16px rgba(0,0,0,0.3)",
+            zIndex: 1
+          }}></div>
         </div>
 
         <button 
-          onClick={() => onSelectRole('player')}
-          style={{ background: '#fff', color: '#000', border: 'none', padding: '10px 35px', borderRadius: '20px', fontSize: '16px', cursor: 'pointer', fontFamily: 'serif', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}
+          onClick={() => onNavigate("player-login")}
+          style={{
+            backgroundColor: "#ffffff",
+            color: "#000000",
+            border: "none",
+            borderRadius: "20px",
+            padding: "8px 36px",
+            fontSize: "16px",
+            fontFamily: "Georgia, serif",
+            cursor: "pointer",
+            boxShadow: "0 4px 8px rgba(0,0,0,0.15)",
+            marginTop: "10px"
+          }}
         >
           Jouer
         </button>
-      </main>
+      </div>
 
-      {/* Barre noire du bas */}
-      <footer style={{ background: '#000', color: '#fff', textAlign: 'center', padding: '12px', fontSize: '13px', fontStyle: 'italic' }}>
-        Créer par l'équipe buzzer - 2026
-      </footer>
+      {/* Bottom Black Bar */}
+      <div style={{
+        backgroundColor: "#000000",
+        color: "#ffffff",
+        textAlign: "center",
+        padding: "10px",
+        fontSize: "14px",
+        fontStyle: "italic"
+      }}>
+        Créé par l'équipe buzzer - 2026
+      </div>
     </div>
   );
-};
+}

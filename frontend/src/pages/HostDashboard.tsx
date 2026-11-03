@@ -1,16 +1,43 @@
 ﻿import { useState } from "react";
 
-export function HostGame() {
+interface HostGameProps {
+  onBack: () => void;
+}
+
+// Host Game dashboard component
+export function HostGame({ onBack }: HostGameProps) {
   const [activeTab, setActiveTab] = useState<"game" | "leaderboard" | "members">("game");
   const [isGameStarted, setIsGameStarted] = useState<boolean>(false);
+  const [gameCode, setGameCode] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  // Simulated data example
-  const members = ["Player 1", "Player 2", "Player 3", "Player 4"];
+  const createGame = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch("http://localhost:8081/games", {
+        method: "POST"
+      });
+      if (!response.ok) {
+        throw new Error("Erreur création partie");
+      }
+      const data: { code: string } = await response.json();
+      setGameCode(data.code);
+      setIsGameStarted(true);
+      setActiveTab("game");
+    } catch (error) {
+      console.error(error);
+      alert("Impossible de créer la partie");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const members = ["Joueur 1", "Joueur 2", "Joueur 3", "Joueur 4"];
   const leaderboard = [
-    { name: "Player 1", score: 120 },
-    { name: "Player 2", score: 90 },
-    { name: "Player 3", score: 75 },
-    { name: "Player 4", score: 40 },
+    { name: "Joueur 1", score: 120 },
+    { name: "Joueur 2", score: 90 },
+    { name: "Joueur 3", score: 75 },
+    { name: "Joueur 4", score: 40 },
   ];
 
   return (
@@ -23,8 +50,7 @@ export function HostGame() {
       fontFamily: "Georgia, serif",
       userSelect: "none"
     }}>
-      
-      {/* 1. TOP BLACK BAR */}
+      {/* Top Black Bar */}
       <div style={{
         backgroundColor: "#000000",
         color: "#ffffff",
@@ -33,7 +59,6 @@ export function HostGame() {
         alignItems: "center",
         justifyContent: "space-between"
       }}>
-        {/* Logo + BUZZER Title */}
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
           <div style={{
             width: "36px",
@@ -52,25 +77,41 @@ export function HostGame() {
           </span>
         </div>
 
-        {/* Disconnect Button */}
-        <button 
-          onClick={() => alert("Host disconnected")}
-          style={{
-            backgroundColor: "#ffffff",
-            color: "#000000",
-            border: "none",
-            borderRadius: "20px",
-            padding: "6px 20px",
-            fontSize: "14px",
-            fontFamily: "Georgia, serif",
-            cursor: "pointer"
-          }}
-        >
-          Disconnect
-        </button>
+        <div style={{ display: "flex", gap: "12px" }}>
+          <button 
+            onClick={onBack}
+            style={{
+              backgroundColor: "#ffffff",
+              color: "#000000",
+              border: "none",
+              borderRadius: "20px",
+              padding: "6px 16px",
+              fontSize: "14px",
+              fontFamily: "Georgia, serif",
+              cursor: "pointer"
+            }}
+          >
+            Retour
+          </button>
+          <button 
+            onClick={() => alert("Animateur déconnecté")}
+            style={{
+              backgroundColor: "#ffffff",
+              color: "#000000",
+              border: "none",
+              borderRadius: "20px",
+              padding: "6px 20px",
+              fontSize: "14px",
+              fontFamily: "Georgia, serif",
+              cursor: "pointer"
+            }}
+          >
+            Déconnecter
+          </button>
+        </div>
       </div>
 
-      {/* 2. CENTRAL CONTENT (2-COLUMN LAYOUT) */}
+      {/* Central Content */}
       <div style={{
         flex: 1,
         display: "flex",
@@ -79,8 +120,6 @@ export function HostGame() {
         padding: "40px 60px",
         gap: "60px"
       }}>
-        
-        {/* Left Column: Title + Buttons */}
         <div style={{
           display: "flex",
           flexDirection: "column",
@@ -99,12 +138,9 @@ export function HostGame() {
           </h1>
 
           <div style={{ display: "flex", flexDirection: "column", gap: "20px", width: "100%" }}>
-            {/* Start Game Button */}
             <button 
-              onClick={() => {
-                setActiveTab("game");
-                setIsGameStarted(true);
-              }}
+              onClick={createGame} 
+              disabled={loading}
               style={{
                 width: "100%",
                 backgroundColor: activeTab === "game" ? "#dfccf7" : "#e2c2f6",
@@ -114,16 +150,14 @@ export function HostGame() {
                 padding: "12px 20px",
                 fontSize: "20px",
                 fontFamily: "Georgia, serif",
-                cursor: "pointer",
+                cursor: loading ? "wait" : "pointer",
                 textAlign: "center",
-                textShadow: "1px 1px 2px rgba(0,0,0,0.1)",
-                boxShadow: activeTab === "game" ? "inset 0 2px 4px rgba(0,0,0,0.2)" : "none"
+                opacity: loading ? 0.7 : 1
               }}
             >
-              {isGameStarted ? "Game in progress" : "Start game"}
+              {loading ? "Création..." : isGameStarted ? "Partie en cours" : "Créer une partie"}
             </button>
 
-            {/* Leaderboard Button */}
             <button 
               onClick={() => setActiveTab("leaderboard")}
               style={{
@@ -139,10 +173,9 @@ export function HostGame() {
                 textAlign: "center"
               }}
             >
-              Leaderboard
+              Classement
             </button>
 
-            {/* Members Button */}
             <button 
               onClick={() => setActiveTab("members")}
               style={{
@@ -158,12 +191,11 @@ export function HostGame() {
                 textAlign: "center"
               }}
             >
-              Members ({members.length})
+              Membres ({members.length})
             </button>
           </div>
         </div>
 
-        {/* Right Column: Dynamic Frame */}
         <div style={{
           flex: 1,
           maxWidth: "500px",
@@ -179,12 +211,20 @@ export function HostGame() {
           {activeTab === "game" && (
             <div>
               <h2 style={{ color: "#ffffff", fontSize: "24px", marginTop: 0, marginBottom: "16px" }}>
-                {isGameStarted ? "Question in progress" : "Game zone"}
+                {isGameStarted ? "Question en cours" : "Salon de jeu"}
               </h2>
+              
+              {gameCode && (
+                <div style={{ marginBottom: "16px" }}>
+                  <h3 style={{ color: "#ffffff", fontSize: "18px", margin: "0 0 6px 0" }}>Code de la partie</h3>
+                  <h1 style={{ color: "#ffffff", fontSize: "36px", margin: 0, letterSpacing: "3px" }}>{gameCode}</h1>
+                </div>
+              )}
+
               <p style={{ color: "#ffffff", fontSize: "16px" }}>
                 {isGameStarted 
-                  ? "The game has started! Waiting for players' answers..." 
-                  : "Click 'Start game' to begin."}
+                  ? "La partie a commencé ! En attente des joueurs..." 
+                  : "Cliquez sur 'Créer une partie' pour générer un code de session."}
               </p>
             </div>
           )}
@@ -192,7 +232,7 @@ export function HostGame() {
           {activeTab === "leaderboard" && (
             <div>
               <h2 style={{ color: "#ffffff", fontSize: "24px", marginTop: 0, marginBottom: "16px" }}>
-                Leaderboard
+                Classement
               </h2>
               <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
                 {leaderboard.map((item, index) => (
@@ -215,7 +255,7 @@ export function HostGame() {
           {activeTab === "members" && (
             <div>
               <h2 style={{ color: "#ffffff", fontSize: "24px", marginTop: 0, marginBottom: "16px" }}>
-                Connected players
+                Joueurs connectés
               </h2>
               <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                 {members.map((member, index) => (
@@ -233,10 +273,8 @@ export function HostGame() {
             </div>
           )}
         </div>
-
       </div>
 
-      {/* 3. BOTTOM BLACK BAR */}
       <div style={{
         backgroundColor: "#000000",
         color: "#ffffff",
@@ -245,9 +283,8 @@ export function HostGame() {
         fontSize: "14px",
         fontStyle: "italic"
       }}>
-        Created by buzzer team - 2026
+        Créé par l'équipe buzzer - 2026
       </div>
-
     </div>
   );
 }
