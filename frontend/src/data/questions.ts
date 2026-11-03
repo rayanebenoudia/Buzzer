@@ -7,7 +7,7 @@
 export const questions: Question[] = [
   {
     question: "A velo, quel equipement est obligatoire pour etre visible la nuit ou lorsque la visibilite est insuffisante ?",
-    options: ["Un gilet rouge", "Un eclairage et des dispositifs reflechissants", "Une lampe sur le casque uniquement", "Une sonnette uniquement"],
+    options: ["Un gilet jaune", "Un eclairage et des dispositifs reflechissants", "Une lampe sur le casque uniquement", "Une sonnette uniquement"],
     correctAnswer: 1
   },
   {
@@ -21,7 +21,7 @@ export const questions: Question[] = [
     correctAnswer: 1
   },
   {
-    question: "Quel plat tunisien est celebre pour etre servi avec un oeuf dans une feuille de brick ?",
+    question: "Quel plat est consommer principalement pendant le Ramadan ?",
     options: ["Lablabi", "Brik", "Ojja", "Couscous"],
     correctAnswer: 1
   },
