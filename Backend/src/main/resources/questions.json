@@ -2,7 +2,7 @@
   {
     "id": 1,
     "text": "À vélo, quel équipement est obligatoire pour être visible la nuit ou lorsque la visibilité est insuffisante ?",
-    "answers": ["Un gilet rouge", "Un éclairage et des dispositifs réfléchissants", "Une lampe sur le casque uniquement", "Une sonnette uniquement"],
+    "answers": ["Un gilet jaune", "Un éclairage et des dispositifs réfléchissants", "Une lampe sur le casque uniquement", "Une sonnette uniquement"],
     "durationSeconds": 20,
     "answerPosition": 1
   },
@@ -22,7 +22,7 @@
   },
   {
     "id": 4,
-    "text": "Quel plat tunisien est célèbre pour être servi avec un œuf dans une feuille de brick ?",
+    "text": "Quel plat est consommer principalement pendant le Ramadan ?",
     "answers": ["Lablabi", "Brik", "Ojja", "Couscous"],
     "durationSeconds": 20,
     "answerPosition": 1
