@@ -6,6 +6,8 @@ import com.example.demo.domain.Player;
 import com.example.demo.service.GameService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/games")
 public class GameRestController {
@@ -18,8 +20,10 @@ public class GameRestController {
 
     // Créer une partie
     @PostMapping
-    public Game createGame() {
-        return gameService.createGame();
+    public Map<String, String> createGame() {
+        Game game = gameService.createGame();
+
+        return Map.of("code", game.getCode());
     }
 
     // Rejoindre une partie

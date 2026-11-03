@@ -9,7 +9,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.List;
 
-public class Game {
+public class   Game {
     private final String code;
     private GameState gameState;
     private final Map<UUID,Player> players = new HashMap<>();
