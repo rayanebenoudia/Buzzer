@@ -4,13 +4,13 @@ export function HostGame() {
   const [activeTab, setActiveTab] = useState<"game" | "leaderboard" | "members">("game");
   const [isGameStarted, setIsGameStarted] = useState<boolean>(false);
 
-  // Exemple de données simulées
-  const members = ["Joueur 1", "Joueur 2", "Joueur 3", "Joueur 4"];
+  // Simulated data example
+  const members = ["Player 1", "Player 2", "Player 3", "Player 4"];
   const leaderboard = [
-    { name: "Joueur 1", score: 120 },
-    { name: "Joueur 2", score: 90 },
-    { name: "Joueur 3", score: 75 },
-    { name: "Joueur 4", score: 40 },
+    { name: "Player 1", score: 120 },
+    { name: "Player 2", score: 90 },
+    { name: "Player 3", score: 75 },
+    { name: "Player 4", score: 40 },
   ];
 
   return (
@@ -24,7 +24,7 @@ export function HostGame() {
       userSelect: "none"
     }}>
       
-      {/* 1. BARRE SUPERIEURE NOIRE */}
+      {/* 1. TOP BLACK BAR */}
       <div style={{
         backgroundColor: "#000000",
         color: "#ffffff",
@@ -33,7 +33,7 @@ export function HostGame() {
         alignItems: "center",
         justifyContent: "space-between"
       }}>
-        {/* Logo + Titre BUZZER */}
+        {/* Logo + BUZZER Title */}
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
           <div style={{
             width: "36px",
@@ -52,9 +52,9 @@ export function HostGame() {
           </span>
         </div>
 
-        {/* Bouton Deconnexion */}
+        {/* Disconnect Button */}
         <button 
-          onClick={() => alert("Déconnexion de l'animateur")}
+          onClick={() => alert("Host disconnected")}
           style={{
             backgroundColor: "#ffffff",
             color: "#000000",
@@ -66,11 +66,11 @@ export function HostGame() {
             cursor: "pointer"
           }}
         >
-          Deconnexion
+          Disconnect
         </button>
       </div>
 
-      {/* 2. CONTENU CENTRAL (DISPOSITION EN 2 COLONNES) */}
+      {/* 2. CENTRAL CONTENT (2-COLUMN LAYOUT) */}
       <div style={{
         flex: 1,
         display: "flex",
@@ -80,7 +80,7 @@ export function HostGame() {
         gap: "60px"
       }}>
         
-        {/* Colonne Gauche : Titre + Boutons */}
+        {/* Left Column: Title + Buttons */}
         <div style={{
           display: "flex",
           flexDirection: "column",
@@ -99,7 +99,7 @@ export function HostGame() {
           </h1>
 
           <div style={{ display: "flex", flexDirection: "column", gap: "20px", width: "100%" }}>
-            {/* Bouton Lancer la partie */}
+            {/* Start Game Button */}
             <button 
               onClick={() => {
                 setActiveTab("game");
@@ -120,10 +120,10 @@ export function HostGame() {
                 boxShadow: activeTab === "game" ? "inset 0 2px 4px rgba(0,0,0,0.2)" : "none"
               }}
             >
-              {isGameStarted ? "Partie en cours" : "Lancer la partie"}
+              {isGameStarted ? "Game in progress" : "Start game"}
             </button>
 
-            {/* Bouton Classement */}
+            {/* Leaderboard Button */}
             <button 
               onClick={() => setActiveTab("leaderboard")}
               style={{
@@ -139,10 +139,10 @@ export function HostGame() {
                 textAlign: "center"
               }}
             >
-              Classement
+              Leaderboard
             </button>
 
-            {/* Bouton Membres */}
+            {/* Members Button */}
             <button 
               onClick={() => setActiveTab("members")}
               style={{
@@ -158,12 +158,12 @@ export function HostGame() {
                 textAlign: "center"
               }}
             >
-              Membres ({members.length})
+              Members ({members.length})
             </button>
           </div>
         </div>
 
-        {/* Colonne Droite : Cadre Dynamique */}
+        {/* Right Column: Dynamic Frame */}
         <div style={{
           flex: 1,
           maxWidth: "500px",
@@ -179,12 +179,12 @@ export function HostGame() {
           {activeTab === "game" && (
             <div>
               <h2 style={{ color: "#ffffff", fontSize: "24px", marginTop: 0, marginBottom: "16px" }}>
-                {isGameStarted ? "Question en cours" : "Zone de jeu"}
+                {isGameStarted ? "Question in progress" : "Game zone"}
               </h2>
               <p style={{ color: "#ffffff", fontSize: "16px" }}>
                 {isGameStarted 
-                  ? "La partie est lancée ! En attente des réponses des joueurs..." 
-                  : "Cliquez sur 'Lancer la partie' pour démarrer."}
+                  ? "The game has started! Waiting for players' answers..." 
+                  : "Click 'Start game' to begin."}
               </p>
             </div>
           )}
@@ -192,7 +192,7 @@ export function HostGame() {
           {activeTab === "leaderboard" && (
             <div>
               <h2 style={{ color: "#ffffff", fontSize: "24px", marginTop: 0, marginBottom: "16px" }}>
-                Classement
+                Leaderboard
               </h2>
               <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
                 {leaderboard.map((item, index) => (
@@ -215,7 +215,7 @@ export function HostGame() {
           {activeTab === "members" && (
             <div>
               <h2 style={{ color: "#ffffff", fontSize: "24px", marginTop: 0, marginBottom: "16px" }}>
-                Joueurs connectés
+                Connected players
               </h2>
               <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                 {members.map((member, index) => (
@@ -236,7 +236,7 @@ export function HostGame() {
 
       </div>
 
-      {/* 3. BARRE INFERIEURE NOIRE */}
+      {/* 3. BOTTOM BLACK BAR */}
       <div style={{
         backgroundColor: "#000000",
         color: "#ffffff",
@@ -245,7 +245,7 @@ export function HostGame() {
         fontSize: "14px",
         fontStyle: "italic"
       }}>
-        Créer par l'équipe buzzer - 2026
+        Created by buzzer team - 2026
       </div>
 
     </div>
