@@ -1,26 +1,34 @@
-﻿import { useState } from 'react';
-import { Home } from './pages/Home';
-import { PlayerGame } from './pages/PlayerGame';
-import { HostDashboard } from './pages/HostDashboard';
+﻿import { useState } from "react";
+import { Home } from "./pages/Home";
+import { PlayerLogin } from "./pages/PlayerLogin";
+import { PlayerGame } from "./pages/PlayerGame";
+import { HostGame } from "./pages/HostGame";
 
 export function App() {
-  const [role, setRole] = useState<'home' | 'player' | 'host'>('home');
+  const [currentPage, setCurrentPage] = useState<"home" | "player-login" | "player-game" | "host-game">("home");
+  const [playerInfo, setPlayerInfo] = useState<{ nickname: string; code: string } | null>(null);
+
+  const handlePlayerJoin = (nickname: string, code: string) => {
+    setPlayerInfo({ nickname, code });
+    setCurrentPage("player-game");
+  };
 
   return (
     <div>
-      {role === 'home' && <Home onSelectRole={(selectedRole) => setRole(selectedRole)} />}
-      {role === 'player' && <PlayerGame />}
-      {role === 'host' && <HostDashboard />}
+      {currentPage === "home" && (
+        <Home onNavigate={(page) => setCurrentPage(page)} />
+      )}
 
-      {role !== 'home' && (
-        <div style={{ textAlign: 'center', marginTop: '30px' }}>
-          <button 
-            onClick={() => setRole('home')}
-            style={{ padding: '8px 16px', background: '#ef4444', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-          >
-            ← Retour à l'accueil
-          </button>
-        </div>
+      {currentPage === "player-login" && (
+        <PlayerLogin onJoin={handlePlayerJoin} onBack={() => setCurrentPage("home")} />
+      )}
+
+      {currentPage === "player-game" && (
+        <PlayerGame />
+      )}
+
+      {currentPage === "host-game" && (
+        <HostGame onBack={() => setCurrentPage("home")} />
       )}
     </div>
   );

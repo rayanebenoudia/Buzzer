@@ -15,7 +15,7 @@ export function PlayerGame() {
       userSelect: "none"
     }}>
       
-      {/* 1. BARRE SUPERIEURE NOIRE */}
+      {/* 1. TOP BLACK BAR */}
       <div style={{
         backgroundColor: "#000000",
         color: "#ffffff",
@@ -41,7 +41,7 @@ export function PlayerGame() {
         </span>
       </div>
 
-      {/* 2. CONTENU CENTRAL */}
+      {/* 2. CENTRAL CONTENT */}
       <div style={{
         flex: 1,
         display: "flex",
@@ -51,7 +51,7 @@ export function PlayerGame() {
         padding: "16px"
       }}>
         
-        {/* Titre BUZZER blanc au-dessus */}
+        {/* White BUZZER title above */}
         <h1 style={{
           color: "#ffffff",
           fontSize: "36px",
@@ -63,7 +63,7 @@ export function PlayerGame() {
           BUZZER
         </h1>
 
-        {/* Carte Blanche Centrale */}
+        {/* Central White Card */}
         <div style={{
           backgroundColor: "#ececec",
           width: "100%",
@@ -78,7 +78,7 @@ export function PlayerGame() {
         }}>
           
           <div>
-            {/* Infos Question / Temps */}
+            {/* Question / Time Info */}
             <div style={{
               display: "flex",
               justifyContent: "space-between",
@@ -87,11 +87,11 @@ export function PlayerGame() {
               color: "#111111",
               marginBottom: "20px"
             }}>
-              <span>Questions 1/10</span>
-              <span>Temps - 05</span>
+              <span>Question 1/10</span>
+              <span>Time - 05</span>
             </div>
 
-            {/* BLOCS DE COULEURS VIERGES */}
+            {/* BLANK COLOR BLOCKS */}
             <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "24px" }}>
               {[0, 1, 2, 3].map((index) => {
                 const isSelected = selectedOption === index;
@@ -116,7 +116,7 @@ export function PlayerGame() {
             </div>
           </div>
 
-          {/* Bouton Validée et statut en petit */}
+          {/* Validate Button and small status */}
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
             <button
               onClick={() => setIsValidated(true)}
@@ -133,7 +133,7 @@ export function PlayerGame() {
                 marginBottom: "16px"
               }}
             >
-              Validée
+              Validate
             </button>
 
             <div style={{
@@ -143,7 +143,7 @@ export function PlayerGame() {
               fontStyle: isValidated ? "italic" : "normal",
               color: isValidated ? "#2e7d32" : "#111111"
             }}>
-              {isValidated ? "Réponse enregistrée" : "En attente"}
+              {isValidated ? "Response recorded" : "Waiting"}
             </div>
           </div>
 
@@ -151,14 +151,14 @@ export function PlayerGame() {
 
       </div>
 
-      {/* 3. MENTION DECONNECTE EN BAS A DROITE */}
+      {/* 3. DISCONNECTED NOTICE BOTTOM RIGHT */}
       <div style={{ paddingRight: "24px", paddingBottom: "8px", textAlign: "right" }}>
         <span style={{ color: "#ff3333", fontWeight: "normal", fontSize: "22px" }}>
-          Deconnecté
+          Disconnected
         </span>
       </div>
 
-      {/* 4. BARRE INFERIEURE NOIRE */}
+      {/* 4. BOTTOM BLACK BAR */}
       <div style={{
         backgroundColor: "#000000",
         color: "#ffffff",
@@ -167,7 +167,7 @@ export function PlayerGame() {
         fontSize: "13px",
         fontStyle: "italic"
       }}>
-        Créer par l'équipe buzzer - 2026
+        Created by buzzer team - 2026
       </div>
 
     </div>

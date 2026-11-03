@@ -1,10 +1,37 @@
 ﻿import { useState } from "react";
 
-export function HostGame() {
+interface HostGameProps {
+  onBack: () => void;
+}
+
+// Host Game dashboard component
+export function HostGame({ onBack }: HostGameProps) {
   const [activeTab, setActiveTab] = useState<"game" | "leaderboard" | "members">("game");
   const [isGameStarted, setIsGameStarted] = useState<boolean>(false);
+  const [gameCode, setGameCode] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  // Exemple de données simulées
+  const createGame = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch("http://localhost:8081/games", {
+        method: "POST"
+      });
+      if (!response.ok) {
+        throw new Error("Erreur création partie");
+      }
+      const data: { code: string } = await response.json();
+      setGameCode(data.code);
+      setIsGameStarted(true);
+      setActiveTab("game");
+    } catch (error) {
+      console.error(error);
+      alert("Impossible de créer la partie");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const members = ["Joueur 1", "Joueur 2", "Joueur 3", "Joueur 4"];
   const leaderboard = [
     { name: "Joueur 1", score: 120 },
@@ -23,8 +50,7 @@ export function HostGame() {
       fontFamily: "Georgia, serif",
       userSelect: "none"
     }}>
-      
-      {/* 1. BARRE SUPERIEURE NOIRE */}
+      {/* Top Black Bar */}
       <div style={{
         backgroundColor: "#000000",
         color: "#ffffff",
@@ -33,7 +59,6 @@ export function HostGame() {
         alignItems: "center",
         justifyContent: "space-between"
       }}>
-        {/* Logo + Titre BUZZER */}
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
           <div style={{
             width: "36px",
@@ -52,25 +77,41 @@ export function HostGame() {
           </span>
         </div>
 
-        {/* Bouton Deconnexion */}
-        <button 
-          onClick={() => alert("Déconnexion de l'animateur")}
-          style={{
-            backgroundColor: "#ffffff",
-            color: "#000000",
-            border: "none",
-            borderRadius: "20px",
-            padding: "6px 20px",
-            fontSize: "14px",
-            fontFamily: "Georgia, serif",
-            cursor: "pointer"
-          }}
-        >
-          Deconnexion
-        </button>
+        <div style={{ display: "flex", gap: "12px" }}>
+          <button 
+            onClick={onBack}
+            style={{
+              backgroundColor: "#ffffff",
+              color: "#000000",
+              border: "none",
+              borderRadius: "20px",
+              padding: "6px 16px",
+              fontSize: "14px",
+              fontFamily: "Georgia, serif",
+              cursor: "pointer"
+            }}
+          >
+            Retour
+          </button>
+          <button 
+            onClick={() => alert("Animateur déconnecté")}
+            style={{
+              backgroundColor: "#ffffff",
+              color: "#000000",
+              border: "none",
+              borderRadius: "20px",
+              padding: "6px 20px",
+              fontSize: "14px",
+              fontFamily: "Georgia, serif",
+              cursor: "pointer"
+            }}
+          >
+            Déconnecter
+          </button>
+        </div>
       </div>
 
-      {/* 2. CONTENU CENTRAL (DISPOSITION EN 2 COLONNES) */}
+      {/* Central Content */}
       <div style={{
         flex: 1,
         display: "flex",
@@ -79,8 +120,6 @@ export function HostGame() {
         padding: "40px 60px",
         gap: "60px"
       }}>
-        
-        {/* Colonne Gauche : Titre + Boutons */}
         <div style={{
           display: "flex",
           flexDirection: "column",
@@ -99,12 +138,9 @@ export function HostGame() {
           </h1>
 
           <div style={{ display: "flex", flexDirection: "column", gap: "20px", width: "100%" }}>
-            {/* Bouton Lancer la partie */}
             <button 
-              onClick={() => {
-                setActiveTab("game");
-                setIsGameStarted(true);
-              }}
+              onClick={createGame} 
+              disabled={loading}
               style={{
                 width: "100%",
                 backgroundColor: activeTab === "game" ? "#dfccf7" : "#e2c2f6",
@@ -114,16 +150,14 @@ export function HostGame() {
                 padding: "12px 20px",
                 fontSize: "20px",
                 fontFamily: "Georgia, serif",
-                cursor: "pointer",
+                cursor: loading ? "wait" : "pointer",
                 textAlign: "center",
-                textShadow: "1px 1px 2px rgba(0,0,0,0.1)",
-                boxShadow: activeTab === "game" ? "inset 0 2px 4px rgba(0,0,0,0.2)" : "none"
+                opacity: loading ? 0.7 : 1
               }}
             >
-              {isGameStarted ? "Partie en cours" : "Lancer la partie"}
+              {loading ? "Création..." : isGameStarted ? "Partie en cours" : "Créer une partie"}
             </button>
 
-            {/* Bouton Classement */}
             <button 
               onClick={() => setActiveTab("leaderboard")}
               style={{
@@ -142,7 +176,6 @@ export function HostGame() {
               Classement
             </button>
 
-            {/* Bouton Membres */}
             <button 
               onClick={() => setActiveTab("members")}
               style={{
@@ -163,7 +196,6 @@ export function HostGame() {
           </div>
         </div>
 
-        {/* Colonne Droite : Cadre Dynamique */}
         <div style={{
           flex: 1,
           maxWidth: "500px",
@@ -179,12 +211,20 @@ export function HostGame() {
           {activeTab === "game" && (
             <div>
               <h2 style={{ color: "#ffffff", fontSize: "24px", marginTop: 0, marginBottom: "16px" }}>
-                {isGameStarted ? "Question en cours" : "Zone de jeu"}
+                {isGameStarted ? "Question en cours" : "Salon de jeu"}
               </h2>
+              
+              {gameCode && (
+                <div style={{ marginBottom: "16px" }}>
+                  <h3 style={{ color: "#ffffff", fontSize: "18px", margin: "0 0 6px 0" }}>Code de la partie</h3>
+                  <h1 style={{ color: "#ffffff", fontSize: "36px", margin: 0, letterSpacing: "3px" }}>{gameCode}</h1>
+                </div>
+              )}
+
               <p style={{ color: "#ffffff", fontSize: "16px" }}>
                 {isGameStarted 
-                  ? "La partie est lancée ! En attente des réponses des joueurs..." 
-                  : "Cliquez sur 'Lancer la partie' pour démarrer."}
+                  ? "La partie a commencé ! En attente des joueurs..." 
+                  : "Cliquez sur 'Créer une partie' pour générer un code de session."}
               </p>
             </div>
           )}
@@ -233,10 +273,8 @@ export function HostGame() {
             </div>
           )}
         </div>
-
       </div>
 
-      {/* 3. BARRE INFERIEURE NOIRE */}
       <div style={{
         backgroundColor: "#000000",
         color: "#ffffff",
@@ -245,9 +283,8 @@ export function HostGame() {
         fontSize: "14px",
         fontStyle: "italic"
       }}>
-        Créer par l'équipe buzzer - 2026
+        Créé par l'équipe buzzer - 2026
       </div>
-
     </div>
   );
 }
