@@ -1,11 +1,9 @@
-﻿import { useState } from "react";
+﻿import { useNavigate } from "react-router-dom";
+import buzzerImg from "../assets/le_buzzer-removebg-preview.png";
 
-interface HomeProps {
-  onNavigate: (page: "player-login" | "host-game") => void;
-}
+export function Home() {
+  const navigate = useNavigate();
 
-// Home screen component
-export function Home({ onNavigate }: HomeProps) {
   return (
     <div style={{
       minHeight: "100vh",
@@ -20,23 +18,23 @@ export function Home({ onNavigate }: HomeProps) {
       <div style={{
         backgroundColor: "#000000",
         color: "#ffffff",
-        padding: "10px 24px",
+        padding: "15px 30px",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between"
       }}>
-        <span style={{ fontSize: "20px", fontWeight: "bold", fontStyle: "italic", letterSpacing: "1px" }}>
+        <span style={{ fontSize: "24px", fontWeight: "bold", fontStyle: "italic", letterSpacing: "1px" }}>
           BUZZER
         </span>
-        <button 
-          onClick={() => onNavigate("host-game")}
+        <button
+          onClick={() => navigate("/host-login")}
           style={{
             backgroundColor: "#ffffff",
             color: "#000000",
             border: "none",
             borderRadius: "20px",
-            padding: "6px 20px",
-            fontSize: "14px",
+            padding: "8px 20px",
+            fontSize: "16px",
             fontFamily: "Georgia, serif",
             cursor: "pointer",
             fontWeight: "bold"
@@ -53,60 +51,47 @@ export function Home({ onNavigate }: HomeProps) {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        padding: "20px",
-        gap: "30px"
+        gap: "20px"
       }}>
-        <h1 style={{
-          color: "#ffffff",
-          fontSize: "40px",
-          fontWeight: "normal",
-          fontStyle: "italic",
-          letterSpacing: "2px",
-          margin: 0,
-          textAlign: "center"
-        }}>
-          BUZZER
-        </h1>
-
-        {/* Buzzer Illustration */}
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", position: "relative" }}>
-          <div style={{ display: "flex", gap: "24px", marginBottom: "8px" }}>
-            <div style={{ width: "4px", height: "12px", backgroundColor: "#ffffff", borderRadius: "2px", transform: "rotate(-25deg)" }}></div>
-            <div style={{ width: "4px", height: "16px", backgroundColor: "#ffffff", borderRadius: "2px" }}></div>
-            <div style={{ width: "4px", height: "12px", backgroundColor: "#ffffff", borderRadius: "2px", transform: "rotate(25deg)" }}></div>
-          </div>
-          <div style={{
-            width: "140px",
-            height: "45px",
-            backgroundColor: "#2bc4ad",
-            borderRadius: "50%",
-            border: "3px solid #1c8877",
-            boxShadow: "inset 0 6px 10px rgba(255,255,255,0.4), 0 4px 6px rgba(0,0,0,0.2)",
-            zIndex: 2
-          }}></div>
-          <div style={{
-            width: "180px",
-            height: "55px",
-            backgroundColor: "#1c3548",
-            borderRadius: "50%",
-            marginTop: "-25px",
-            boxShadow: "0 8px 16px rgba(0,0,0,0.3)",
-            zIndex: 1
-          }}></div>
+        <div style={{ textAlign: "center" }}>
+          <h1 style={{ color: "#ffffff", fontSize: "36px", fontStyle: "italic", marginBottom: "10px", letterSpacing: "2px" }}>
+            BUZZER
+          </h1>
         </div>
 
-        <button 
-          onClick={() => onNavigate("player-login")}
+        {/* Real Buzzer Image */}
+        <div 
+          onClick={() => navigate("/player-login")}
+          style={{ cursor: "pointer", display: "flex", justifyContent: "center" }}
+        >
+          <img 
+            src={buzzerImg} 
+            alt="Buzzer" 
+            style={{ 
+              width: "280px", 
+              height: "auto",
+              filter: "drop-shadow(0px 10px 15px rgba(0,0,0,0.2))",
+              transition: "transform 0.1s ease"
+            }}
+            onMouseDown={(e) => e.currentTarget.style.transform = "scale(0.96)"}
+            onMouseUp={(e) => e.currentTarget.style.transform = "scale(1)"}
+          />
+        </div>
+
+        {/* Play Button */}
+        <button
+          onClick={() => navigate("/player-login")}
           style={{
             backgroundColor: "#ffffff",
             color: "#000000",
-            border: "none",
+            border: "2px solid #ffffff",
             borderRadius: "20px",
-            padding: "8px 36px",
-            fontSize: "16px",
+            padding: "10px 40px",
+            fontSize: "18px",
             fontFamily: "Georgia, serif",
             cursor: "pointer",
-            boxShadow: "0 4px 8px rgba(0,0,0,0.15)",
+            fontWeight: "bold",
+            boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
             marginTop: "10px"
           }}
         >
@@ -119,7 +104,7 @@ export function Home({ onNavigate }: HomeProps) {
         backgroundColor: "#000000",
         color: "#ffffff",
         textAlign: "center",
-        padding: "10px",
+        padding: "12px",
         fontSize: "14px",
         fontStyle: "italic"
       }}>
