@@ -1,75 +1,57 @@
-# React + TypeScript + Vite
+Buzzer Application - Technical Documentation
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+An interactive real-time quiz and buzzer application built with a decoupled architecture using React/TypeScript on the frontend and Spring Boot on the backend.
 
-Currently, two official plugins are available:
+Directory Structure
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+buzzer/
+├── frontend/ # React + TypeScript application (Vite)
+│ ├── src/
+│ │ ├── pages/ # Main views (Home, PlayerGame, HostGame, etc.)
+│ │ ├── assets/ # Graphic assets (images, buzzer logo)
+│ │ ├── App.tsx # Routing configuration (react-router-dom)
+│ │ └── main.tsx # Application entry point
+│ ├── package.json # Dependencies and npm scripts
+│ └── vite.config.ts # Vite configuration
+│
+└── backend/ # Spring Boot REST API (Java)
+├── src/
+│ └── main/java/ # Source code (Controllers, Models, Services)
+├── pom.xml # Maven configuration and dependencies
+└── mvnw # Maven wrapper
 
-## React Compiler
+Quick Start Guide
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. Launch the Backend (Spring Boot)
 
-## Expanding the ESLint configuration
+Open a terminal, navigate to the backend folder, and execute:
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+# On Windows (PowerShell / CMD)
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+mvn spring-boot:run
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+# On Linux / macOS / Git Bash
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+./mvnw spring-boot:run
 
-```
+The server starts on http://localhost:8081.
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+2. Launch the Frontend (Vite / React)
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Open a second terminal, navigate to the frontend folder, and execute:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Install dependencies (first time only)
 
-```
+npm install
+
+# Start the Vite development server
+
+npm run dev
+
+The application will be accessible at http://localhost:5173.
+
+Technical Stack
+
+Frontend: React, TypeScript, Vite, React Router, inline CSS (Beige background #e6dfd5, black text, Georgia font).
+
+Backend: Spring Boot (Java), REST API for session management and quiz logic.
