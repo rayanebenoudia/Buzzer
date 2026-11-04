@@ -96,7 +96,7 @@ export function HostGame({ onBack, sessionCode }: HostGameProps) {
         >
           Retour
         </button>
-        <span style={{ fontSize: "20px", fontWeight: "bold", fontStyle: "italic", letterSpacing: "1px" }}>
+        <span style={{ fontSize: "20px", fontStyle: "italic", letterSpacing: "1px", fontWeight: "normal" }}>
           TABLEAU DE BORD ANIMATEUR {sessionCode ? `- Code : ${sessionCode}` : ""}
         </span>
         <span style={{ fontSize: "16px" }}>Mode Animateur</span>
@@ -110,11 +110,12 @@ export function HostGame({ onBack, sessionCode }: HostGameProps) {
         padding: "20px"
       }}>
         <div style={{
-          backgroundColor: "#dfccf7",
+          backgroundColor: "#e6dfd5",
           width: "100%",
           maxWidth: "700px",
           padding: "36px",
           border: "4px solid #ffffff",
+          boxShadow: "0 10px 25px rgba(0,0,0,0.15)",
           boxSizing: "border-box",
           display: "flex",
           flexDirection: "column",
@@ -122,12 +123,12 @@ export function HostGame({ onBack, sessionCode }: HostGameProps) {
         }}>
           {currentQuestion ? (
             <div style={{ width: "100%" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", color: "#ffffff", marginBottom: "20px", fontSize: "16px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", color: "#000000", marginBottom: "20px", fontSize: "16px" }}>
                 <span>Question {currentIndex + 1} / {questions.length}</span>
                 <span>{validatedRound ? "Statut : Réponses validées" : "Statut : En cours..."}</span>
               </div>
 
-              <h2 style={{ color: "#ffffff", fontSize: "24px", marginBottom: "24px", textAlign: "center" }}>
+              <h2 style={{ color: "#000000", fontSize: "24px", marginBottom: "24px", textAlign: "center", fontWeight: "normal" }}>
                 {currentQuestion.text}
               </h2>
 
@@ -138,21 +139,22 @@ export function HostGame({ onBack, sessionCode }: HostGameProps) {
                     <div
                       key={index}
                       style={{
-                        backgroundColor: validatedRound && isCorrect ? "#4caf50" : "rgba(255,255,255,0.3)",
-                        color: "#ffffff",
-                        border: "2px solid #ffffff",
+                        backgroundColor: validatedRound && isCorrect ? "#4caf50" : "#ffffff",
+                        color: validatedRound && isCorrect ? "#ffffff" : "#000000",
+                        border: "2px solid #d5cec3",
                         borderRadius: "20px",
                         padding: "12px 20px",
                         fontSize: "18px",
                         fontFamily: "Georgia, serif",
                         display: "flex",
                         justifyContent: "space-between",
-                        alignItems: "center"
+                        alignItems: "center",
+                        boxShadow: "0 2px 4px rgba(0,0,0,0.05)"
                       }}
                     >
                       <span>{option}</span>
                       {validatedRound && isCorrect && (
-                        <span style={{ fontWeight: "bold", fontSize: "14px", backgroundColor: "#ffffff", color: "#4caf50", padding: "2px 8px", borderRadius: "10px" }}>
+                        <span style={{ fontSize: "14px", backgroundColor: "#ffffff", color: "#4caf50", padding: "2px 8px", borderRadius: "10px" }}>
                           Correcte
                         </span>
                       )}
@@ -174,8 +176,7 @@ export function HostGame({ onBack, sessionCode }: HostGameProps) {
                     padding: "12px",
                     fontSize: "16px",
                     fontFamily: "Georgia, serif",
-                    cursor: validatedRound ? "not-allowed" : "pointer",
-                    fontWeight: "bold"
+                    cursor: validatedRound ? "not-allowed" : "pointer"
                   }}
                 >
                   Valider les réponses
@@ -193,8 +194,7 @@ export function HostGame({ onBack, sessionCode }: HostGameProps) {
                     padding: "12px",
                     fontSize: "16px",
                     fontFamily: "Georgia, serif",
-                    cursor: currentIndex + 1 >= questions.length ? "not-allowed" : "pointer",
-                    fontWeight: "bold"
+                    cursor: currentIndex + 1 >= questions.length ? "not-allowed" : "pointer"
                   }}
                 >
                   Question suivante
@@ -202,9 +202,9 @@ export function HostGame({ onBack, sessionCode }: HostGameProps) {
               </div>
             </div>
           ) : (
-            <div style={{ textAlign: "center", color: "#ffffff" }}>
-              <h2 style={{ fontSize: "32px", marginBottom: "16px" }}>Quiz terminé !</h2>
-              <p style={{ fontSize: "20px" }}>Toutes les questions ont été posées.</p>
+            <div style={{ textAlign: "center", color: "#000000" }}>
+              <h2 style={{ fontSize: "32px", marginBottom: "16px", color: "#000000", fontWeight: "normal" }}>Quiz terminé !</h2>
+              <p style={{ fontSize: "20px", color: "#000000" }}>Toutes les questions ont été posées.</p>
             </div>
           )}
         </div>

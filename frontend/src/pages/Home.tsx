@@ -14,7 +14,6 @@ export function Home() {
       fontFamily: "Georgia, serif",
       userSelect: "none"
     }}>
-      {/* Top Black Bar */}
       <div style={{
         backgroundColor: "#000000",
         color: "#ffffff",
@@ -23,7 +22,7 @@ export function Home() {
         alignItems: "center",
         justifyContent: "space-between"
       }}>
-        <span style={{ fontSize: "24px", fontWeight: "bold", fontStyle: "italic", letterSpacing: "1px" }}>
+        <span style={{ fontSize: "24px", fontStyle: "italic", letterSpacing: "1px" }}>
           BUZZER
         </span>
         <button
@@ -36,15 +35,13 @@ export function Home() {
             padding: "8px 20px",
             fontSize: "16px",
             fontFamily: "Georgia, serif",
-            cursor: "pointer",
-            fontWeight: "bold"
+            cursor: "pointer"
           }}
         >
           Animateur
         </button>
       </div>
 
-      {/* Central Content */}
       <div style={{
         flex: 1,
         display: "flex",
@@ -59,7 +56,6 @@ export function Home() {
           </h1>
         </div>
 
-        {/* Real Buzzer Image */}
         <div 
           onClick={() => navigate("/player-login")}
           style={{ cursor: "pointer", display: "flex", justifyContent: "center" }}
@@ -78,7 +74,6 @@ export function Home() {
           />
         </div>
 
-        {/* Play Button */}
         <button
           onClick={() => navigate("/player-login")}
           style={{
@@ -90,7 +85,6 @@ export function Home() {
             fontSize: "18px",
             fontFamily: "Georgia, serif",
             cursor: "pointer",
-            fontWeight: "bold",
             boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
             marginTop: "10px"
           }}
@@ -99,7 +93,6 @@ export function Home() {
         </button>
       </div>
 
-      {/* Bottom Black Bar */}
       <div style={{
         backgroundColor: "#000000",
         color: "#ffffff",

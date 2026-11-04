@@ -97,11 +97,12 @@ export function PlayerGame() {
         padding: "20px"
       }}>
         <div style={{
-          backgroundColor: "#dfccf7",
+          backgroundColor: "#f5f2eb",
           width: "100%",
           maxWidth: "600px",
           padding: "36px",
           border: "4px solid #ffffff",
+          boxShadow: "0 10px 25px rgba(0,0,0,0.15)",
           boxSizing: "border-box",
           display: "flex",
           flexDirection: "column",
@@ -109,11 +110,11 @@ export function PlayerGame() {
         }}>
           {currentQuestion ? (
             <div style={{ width: "100%" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", color: "#ffffff", marginBottom: "20px", fontSize: "16px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", color: "#333333", marginBottom: "20px", fontSize: "16px", fontWeight: "bold" }}>
                 <span>Question {currentIndex + 1} / {questions.length}</span>
               </div>
 
-              <h2 style={{ color: "#ffffff", fontSize: "24px", marginBottom: "24px", textAlign: "center" }}>
+              <h2 style={{ color: "#222222", fontSize: "24px", marginBottom: "24px", textAlign: "center" }}>
                 {currentQuestion.text}
               </h2>
 
@@ -123,15 +124,16 @@ export function PlayerGame() {
                     key={index}
                     onClick={() => handleSelectOption(index)}
                     style={{
-                      backgroundColor: selectedOption === index ? "#1e5272" : "rgba(255,255,255,0.3)",
-                      color: "#ffffff",
-                      border: "2px solid #ffffff",
+                      backgroundColor: selectedOption === index ? "#1e5272" : "#ffffff",
+                      color: selectedOption === index ? "#ffffff" : "#222222",
+                      border: "2px solid #dcd6cd",
                       borderRadius: "20px",
                       padding: "12px 20px",
                       fontSize: "18px",
                       fontFamily: "Georgia, serif",
                       cursor: isAnswerSubmitted ? "not-allowed" : "pointer",
-                      textAlign: "left"
+                      textAlign: "left",
+                      boxShadow: "0 2px 4px rgba(0,0,0,0.05)"
                     }}
                   >
                     {option}
@@ -148,17 +150,18 @@ export function PlayerGame() {
                   color: "#000000",
                   border: "2px solid #000000",
                   borderRadius: "20px",
-                  padding: "10px",
+                  padding: "12px",
                   fontSize: "18px",
                   fontFamily: "Georgia, serif",
-                  cursor: (selectedOption === null || isAnswerSubmitted) ? "not-allowed" : "pointer"
+                  cursor: (selectedOption === null || isAnswerSubmitted) ? "not-allowed" : "pointer",
+                  fontWeight: "bold"
                 }}
               >
                 {isAnswerSubmitted ? "Réponse envoyée (En attente de l'animateur)" : "Valider ma réponse"}
               </button>
             </div>
           ) : (
-            <div style={{ textAlign: "center", color: "#ffffff" }}>
+            <div style={{ textAlign: "center", color: "#222222" }}>
               <h2 style={{ fontSize: "32px", marginBottom: "16px" }}>Partie terminée !</h2>
               <p style={{ fontSize: "22px" }}>Votre score final est de : {score} points</p>
             </div>
