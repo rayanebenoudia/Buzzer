@@ -1,6 +1,5 @@
 ﻿import { useState, useEffect } from "react";
 
-// Interface representing a quiz question structure
 interface Question {
   id: number;
   text: string;
@@ -8,16 +7,14 @@ interface Question {
   correctAnswer: number;
 }
 
-// Player Game screen component
 export function PlayerGame() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [score, setScore] = useState<number>(0);
-  const [isFinished, setIsFinished] = useState<boolean>(false);
+  const [isAnswerSubmitted, setIsAnswerSubmitted] = useState<boolean>(false);
 
-  // Fetch questions from the backend API on component mount
   useEffect(() => {
     fetch("http://localhost:8081/questions")
       .then((res) => {
@@ -34,23 +31,18 @@ export function PlayerGame() {
       });
   }, []);
 
-  // Handle answer selection
   const handleSelectOption = (index: number) => {
-    setSelectedOption(index);
+    if (!isAnswerSubmitted) {
+      setSelectedOption(index);
+    }
   };
 
-  // Move to the next question
-  const handleNextQuestion = () => {
-    if (selectedOption !== null && questions[currentIndex]) {
+  const handleSubmitAnswer = () => {
+    if (selectedOption !== null && questions[currentIndex] && !isAnswerSubmitted) {
       if (selectedOption === questions[currentIndex].correctAnswer) {
         setScore(score + 10);
       }
-    }
-    setSelectedOption(null);
-    if (currentIndex + 1 < questions.length) {
-      setCurrentIndex(currentIndex + 1);
-    } else {
-      setIsFinished(true);
+      setIsAnswerSubmitted(true);
     }
   };
 
@@ -83,7 +75,6 @@ export function PlayerGame() {
       fontFamily: "Georgia, serif",
       userSelect: "none"
     }}>
-      {/* Top Black Bar */}
       <div style={{
         backgroundColor: "#000000",
         color: "#ffffff",
@@ -93,12 +84,11 @@ export function PlayerGame() {
         justifyContent: "space-between"
       }}>
         <span style={{ fontSize: "20px", fontWeight: "bold", fontStyle: "italic", letterSpacing: "1px" }}>
-          BUZZER
+          BUZZER - JOUEUR
         </span>
         <span style={{ fontSize: "16px" }}>Score : {score} pts</span>
       </div>
 
-      {/* Central Content */}
       <div style={{
         flex: 1,
         display: "flex",
@@ -117,7 +107,7 @@ export function PlayerGame() {
           flexDirection: "column",
           alignItems: "center"
         }}>
-          {!isFinished && currentQuestion ? (
+          {currentQuestion ? (
             <div style={{ width: "100%" }}>
               <div style={{ display: "flex", justifyContent: "space-between", color: "#ffffff", marginBottom: "20px", fontSize: "16px" }}>
                 <span>Question {currentIndex + 1} / {questions.length}</span>
@@ -140,7 +130,7 @@ export function PlayerGame() {
                       padding: "12px 20px",
                       fontSize: "18px",
                       fontFamily: "Georgia, serif",
-                      cursor: "pointer",
+                      cursor: isAnswerSubmitted ? "not-allowed" : "pointer",
                       textAlign: "left"
                     }}
                   >
@@ -150,21 +140,21 @@ export function PlayerGame() {
               </div>
 
               <button
-                onClick={handleNextQuestion}
-                disabled={selectedOption === null}
+                onClick={handleSubmitAnswer}
+                disabled={selectedOption === null || isAnswerSubmitted}
                 style={{
                   width: "100%",
-                  backgroundColor: selectedOption === null ? "#cccccc" : "#a5d6a7",
+                  backgroundColor: (selectedOption === null || isAnswerSubmitted) ? "#cccccc" : "#a5d6a7",
                   color: "#000000",
                   border: "2px solid #000000",
                   borderRadius: "20px",
                   padding: "10px",
                   fontSize: "18px",
                   fontFamily: "Georgia, serif",
-                  cursor: selectedOption === null ? "not-allowed" : "pointer"
+                  cursor: (selectedOption === null || isAnswerSubmitted) ? "not-allowed" : "pointer"
                 }}
               >
-                Valider / Suivant
+                {isAnswerSubmitted ? "Réponse envoyée (En attente de l'animateur)" : "Valider ma réponse"}
               </button>
             </div>
           ) : (
@@ -176,7 +166,6 @@ export function PlayerGame() {
         </div>
       </div>
 
-      {/* Bottom Black Bar */}
       <div style={{
         backgroundColor: "#000000",
         color: "#ffffff",

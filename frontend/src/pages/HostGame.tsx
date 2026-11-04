@@ -1,44 +1,68 @@
-﻿import { useState } from "react";
+﻿import { useState, useEffect } from "react";
+
+interface Question {
+  id: number;
+  text: string;
+  options: string[];
+  correctAnswer: number;
+}
 
 interface HostGameProps {
   onBack: () => void;
+  sessionCode?: string;
 }
 
-// Host Game dashboard component
-export function HostGame({ onBack }: HostGameProps) {
-  const [activeTab, setActiveTab] = useState<"game" | "leaderboard" | "members">("game");
-  const [isGameStarted, setIsGameStarted] = useState<boolean>(false);
-  const [gameCode, setGameCode] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+export function HostGame({ onBack, sessionCode }: HostGameProps) {
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [validatedRound, setValidatedRound] = useState<boolean>(false);
 
-  const createGame = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch("http://localhost:8081/games", {
-        method: "POST"
+  useEffect(() => {
+    fetch("http://localhost:8081/questions")
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch questions");
+        return res.json();
+      })
+      .then((data) => {
+        setQuestions(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        setLoading(false);
       });
-      if (!response.ok) {
-        throw new Error("Erreur création partie");
-      }
-      const data: { code: string } = await response.json();
-      setGameCode(data.code);
-      setIsGameStarted(true);
-      setActiveTab("game");
-    } catch (error) {
-      console.error(error);
-      alert("Impossible de créer la partie");
-    } finally {
-      setLoading(false);
+  }, []);
+
+  const handleValidateAnswers = () => {
+    setValidatedRound(true);
+  };
+
+  const handleNextQuestion = () => {
+    setValidatedRound(false);
+    if (currentIndex + 1 < questions.length) {
+      setCurrentIndex(currentIndex + 1);
     }
   };
 
-  const members = ["Joueur 1", "Joueur 2", "Joueur 3", "Joueur 4"];
-  const leaderboard = [
-    { name: "Joueur 1", score: 120 },
-    { name: "Joueur 2", score: 90 },
-    { name: "Joueur 3", score: 75 },
-    { name: "Joueur 4", score: 40 },
-  ];
+  if (loading) {
+    return (
+      <div style={{
+        minHeight: "100vh",
+        backgroundColor: "#85c5e5",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        color: "#ffffff",
+        fontSize: "24px",
+        fontFamily: "Georgia, serif"
+      }}>
+        Chargement des questions pour l'animateur...
+      </div>
+    );
+  }
+
+  const currentQuestion = questions[currentIndex];
 
   return (
     <div style={{
@@ -50,7 +74,6 @@ export function HostGame({ onBack }: HostGameProps) {
       fontFamily: "Georgia, serif",
       userSelect: "none"
     }}>
-      {/* Top Black Bar */}
       <div style={{
         backgroundColor: "#000000",
         color: "#ffffff",
@@ -59,217 +82,129 @@ export function HostGame({ onBack }: HostGameProps) {
         alignItems: "center",
         justifyContent: "space-between"
       }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <div style={{
-            width: "36px",
-            height: "36px",
-            borderRadius: "50%",
-            backgroundColor: "#00bcd4",
-            border: "2px solid #ffffff",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center"
-          }}>
-            <div style={{ width: "22px", height: "9px", backgroundColor: "#ffffff", borderRadius: "4px" }}></div>
-          </div>
-          <span style={{ fontSize: "22px", fontWeight: "bold", fontStyle: "italic", letterSpacing: "1px" }}>
-            BUZZER
-          </span>
-        </div>
-
-        <div style={{ display: "flex", gap: "12px" }}>
-          <button 
-            onClick={onBack}
-            style={{
-              backgroundColor: "#ffffff",
-              color: "#000000",
-              border: "none",
-              borderRadius: "20px",
-              padding: "6px 16px",
-              fontSize: "14px",
-              fontFamily: "Georgia, serif",
-              cursor: "pointer"
-            }}
-          >
-            Retour
-          </button>
-          <button 
-            onClick={() => alert("Animateur déconnecté")}
-            style={{
-              backgroundColor: "#ffffff",
-              color: "#000000",
-              border: "none",
-              borderRadius: "20px",
-              padding: "6px 20px",
-              fontSize: "14px",
-              fontFamily: "Georgia, serif",
-              cursor: "pointer"
-            }}
-          >
-            Déconnecter
-          </button>
-        </div>
+        <button
+          onClick={onBack}
+          style={{
+            backgroundColor: "transparent",
+            color: "#ffffff",
+            border: "1px solid #ffffff",
+            borderRadius: "4px",
+            padding: "5px 10px",
+            cursor: "pointer",
+            fontFamily: "Georgia, serif"
+          }}
+        >
+          Retour
+        </button>
+        <span style={{ fontSize: "20px", fontWeight: "bold", fontStyle: "italic", letterSpacing: "1px" }}>
+          TABLEAU DE BORD ANIMATEUR {sessionCode ? `- Code : ${sessionCode}` : ""}
+        </span>
+        <span style={{ fontSize: "16px" }}>Mode Animateur</span>
       </div>
 
-      {/* Central Content */}
       <div style={{
         flex: 1,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        padding: "40px 60px",
-        gap: "60px"
+        padding: "20px"
       }}>
         <div style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "flex-start",
-          width: "300px"
-        }}>
-          <h1 style={{
-            color: "#ffffff",
-            fontSize: "42px",
-            fontWeight: "normal",
-            fontStyle: "italic",
-            letterSpacing: "2px",
-            marginBottom: "30px"
-          }}>
-            BUZZER
-          </h1>
-
-          <div style={{ display: "flex", flexDirection: "column", gap: "20px", width: "100%" }}>
-            <button 
-              onClick={createGame} 
-              disabled={loading}
-              style={{
-                width: "100%",
-                backgroundColor: activeTab === "game" ? "#dfccf7" : "#e2c2f6",
-                color: "#ffffff",
-                border: "none",
-                borderRadius: "25px",
-                padding: "12px 20px",
-                fontSize: "20px",
-                fontFamily: "Georgia, serif",
-                cursor: loading ? "wait" : "pointer",
-                textAlign: "center",
-                opacity: loading ? 0.7 : 1
-              }}
-            >
-              {loading ? "Création..." : isGameStarted ? "Partie en cours" : "Créer une partie"}
-            </button>
-
-            <button 
-              onClick={() => setActiveTab("leaderboard")}
-              style={{
-                width: "100%",
-                backgroundColor: activeTab === "leaderboard" ? "#153a52" : "#1e5272",
-                color: "#ffffff",
-                border: "none",
-                borderRadius: "25px",
-                padding: "12px 20px",
-                fontSize: "20px",
-                fontFamily: "Georgia, serif",
-                cursor: "pointer",
-                textAlign: "center"
-              }}
-            >
-              Classement
-            </button>
-
-            <button 
-              onClick={() => setActiveTab("members")}
-              style={{
-                width: "100%",
-                backgroundColor: activeTab === "members" ? "#153a52" : "#1e5272",
-                color: "#ffffff",
-                border: "none",
-                borderRadius: "25px",
-                padding: "12px 20px",
-                fontSize: "20px",
-                fontFamily: "Georgia, serif",
-                cursor: "pointer",
-                textAlign: "center"
-              }}
-            >
-              Membres ({members.length})
-            </button>
-          </div>
-        </div>
-
-        <div style={{
-          flex: 1,
-          maxWidth: "500px",
-          minHeight: "320px",
           backgroundColor: "#dfccf7",
+          width: "100%",
+          maxWidth: "700px",
+          padding: "36px",
           border: "4px solid #ffffff",
           boxSizing: "border-box",
-          padding: "24px",
           display: "flex",
           flexDirection: "column",
-          justifyContent: "space-between"
+          alignItems: "center"
         }}>
-          {activeTab === "game" && (
-            <div>
-              <h2 style={{ color: "#ffffff", fontSize: "24px", marginTop: 0, marginBottom: "16px" }}>
-                {isGameStarted ? "Question en cours" : "Salon de jeu"}
-              </h2>
-              
-              {gameCode && (
-                <div style={{ marginBottom: "16px" }}>
-                  <h3 style={{ color: "#ffffff", fontSize: "18px", margin: "0 0 6px 0" }}>Code de la partie</h3>
-                  <h1 style={{ color: "#ffffff", fontSize: "36px", margin: 0, letterSpacing: "3px" }}>{gameCode}</h1>
-                </div>
-              )}
-
-              <p style={{ color: "#ffffff", fontSize: "16px" }}>
-                {isGameStarted 
-                  ? "La partie a commencé ! En attente des joueurs..." 
-                  : "Cliquez sur 'Créer une partie' pour générer un code de session."}
-              </p>
-            </div>
-          )}
-
-          {activeTab === "leaderboard" && (
-            <div>
-              <h2 style={{ color: "#ffffff", fontSize: "24px", marginTop: 0, marginBottom: "16px" }}>
-                Classement
-              </h2>
-              <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-                {leaderboard.map((item, index) => (
-                  <li key={index} style={{
-                    color: "#ffffff",
-                    fontSize: "18px",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    padding: "6px 0",
-                    borderBottom: "1px solid rgba(255,255,255,0.3)"
-                  }}>
-                    <span>{index + 1}. {item.name}</span>
-                    <span>{item.score} pts</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {activeTab === "members" && (
-            <div>
-              <h2 style={{ color: "#ffffff", fontSize: "24px", marginTop: 0, marginBottom: "16px" }}>
-                Joueurs connectés
-              </h2>
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                {members.map((member, index) => (
-                  <div key={index} style={{
-                    color: "#ffffff",
-                    fontSize: "18px",
-                    backgroundColor: "rgba(255,255,255,0.2)",
-                    padding: "8px 12px",
-                    borderRadius: "8px"
-                  }}>
-                    🟢 {member}
-                  </div>
-                ))}
+          {currentQuestion ? (
+            <div style={{ width: "100%" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", color: "#ffffff", marginBottom: "20px", fontSize: "16px" }}>
+                <span>Question {currentIndex + 1} / {questions.length}</span>
+                <span>{validatedRound ? "Statut : Réponses validées" : "Statut : En cours..."}</span>
               </div>
+
+              <h2 style={{ color: "#ffffff", fontSize: "24px", marginBottom: "24px", textAlign: "center" }}>
+                {currentQuestion.text}
+              </h2>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: "12px", width: "100%", marginBottom: "24px" }}>
+                {currentQuestion.options.map((option, index) => {
+                  const isCorrect = index === currentQuestion.correctAnswer;
+                  return (
+                    <div
+                      key={index}
+                      style={{
+                        backgroundColor: validatedRound && isCorrect ? "#4caf50" : "rgba(255,255,255,0.3)",
+                        color: "#ffffff",
+                        border: "2px solid #ffffff",
+                        borderRadius: "20px",
+                        padding: "12px 20px",
+                        fontSize: "18px",
+                        fontFamily: "Georgia, serif",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center"
+                      }}
+                    >
+                      <span>{option}</span>
+                      {validatedRound && isCorrect && (
+                        <span style={{ fontWeight: "bold", fontSize: "14px", backgroundColor: "#ffffff", color: "#4caf50", padding: "2px 8px", borderRadius: "10px" }}>
+                          Correcte
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div style={{ display: "flex", gap: "12px" }}>
+                <button
+                  onClick={handleValidateAnswers}
+                  disabled={validatedRound}
+                  style={{
+                    flex: 1,
+                    backgroundColor: validatedRound ? "#cccccc" : "#ffb74d",
+                    color: "#000000",
+                    border: "2px solid #000000",
+                    borderRadius: "20px",
+                    padding: "12px",
+                    fontSize: "16px",
+                    fontFamily: "Georgia, serif",
+                    cursor: validatedRound ? "not-allowed" : "pointer",
+                    fontWeight: "bold"
+                  }}
+                >
+                  Valider les réponses
+                </button>
+
+                <button
+                  onClick={handleNextQuestion}
+                  disabled={currentIndex + 1 >= questions.length}
+                  style={{
+                    flex: 1,
+                    backgroundColor: currentIndex + 1 >= questions.length ? "#cccccc" : "#a5d6a7",
+                    color: "#000000",
+                    border: "2px solid #000000",
+                    borderRadius: "20px",
+                    padding: "12px",
+                    fontSize: "16px",
+                    fontFamily: "Georgia, serif",
+                    cursor: currentIndex + 1 >= questions.length ? "not-allowed" : "pointer",
+                    fontWeight: "bold"
+                  }}
+                >
+                  Question suivante
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div style={{ textAlign: "center", color: "#ffffff" }}>
+              <h2 style={{ fontSize: "32px", marginBottom: "16px" }}>Quiz terminé !</h2>
+              <p style={{ fontSize: "20px" }}>Toutes les questions ont été posées.</p>
             </div>
           )}
         </div>
@@ -288,5 +223,3 @@ export function HostGame({ onBack }: HostGameProps) {
     </div>
   );
 }
-
-export const HostDashboard = HostGame;
